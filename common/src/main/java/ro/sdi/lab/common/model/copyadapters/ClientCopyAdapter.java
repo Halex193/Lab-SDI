@@ -1,6 +1,7 @@
-package ro.sdi.lab.common.model.copyadapters;
+package ro.sdi.lab24.model.copyadapters;
 
-import ro.sdi.lab.common.model.Client;
+
+import ro.sdi.lab24.model.Client;
 
 public class ClientCopyAdapter implements CopyAdapter<Client>
 {

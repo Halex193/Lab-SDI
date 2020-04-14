@@ -1,4 +1,4 @@
-package ro.sdi.lab.server.controller;
+package ro.sdi.lab24.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,28 +10,27 @@ import java.time.format.DateTimeParseException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import ro.sdi.lab.common.controller.RentalController;
-import ro.sdi.lab.common.exception.AlreadyExistingElementException;
-import ro.sdi.lab.common.exception.DateTimeInvalidException;
-import ro.sdi.lab.common.exception.ElementNotFoundException;
-import ro.sdi.lab.common.model.Rental;
-import ro.sdi.lab.server.repository.Repository;
-import ro.sdi.lab.server.validation.Validator;
+import ro.sdi.lab24.exception.AlreadyExistingElementException;
+import ro.sdi.lab24.exception.DateTimeInvalidException;
+import ro.sdi.lab24.exception.ElementNotFoundException;
+import ro.sdi.lab24.model.Rental;
+import ro.sdi.lab24.repository.Repository;
+import ro.sdi.lab24.validation.Validator;
 
 @Service
-public class RentalControllerImpl implements RentalController
+public class RentalController
 {
-    public static final Logger log = LoggerFactory.getLogger(RentalControllerImpl.class);
+    public static final Logger log = LoggerFactory.getLogger(RentalController.class);
 
-    private final ClientControllerImpl clientController;
-    private final MovieControllerImpl movieController;
+    private final ClientController clientController;
+    private final MovieController movieController;
     Repository<Rental.RentalID, Rental> rentalRepository;
     Validator<Rental> rentalValidator;
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    public RentalControllerImpl(
-            ClientControllerImpl clientController,
-            MovieControllerImpl movieController,
+    public RentalController(
+            ClientController clientController,
+            MovieController movieController,
             Repository<Rental.RentalID, Rental> rentalRepository,
             Validator<Rental> rentalValidator
     )
@@ -70,7 +69,6 @@ public class RentalControllerImpl implements RentalController
      * @throws AlreadyExistingElementException if the rental already exists in the repository
      * @throws DateTimeInvalidException        if the date and time cannot be parsed
      */
-    @Override
     public void addRental(int movieId, int clientId, String time)
     {
         checkRentalID(movieId, clientId);
@@ -122,7 +120,6 @@ public class RentalControllerImpl implements RentalController
      * @param clientId: the ID of the client
      * @throws ElementNotFoundException if the movie, client don't exist of if the rental itself doesn't exist in the repository
      */
-    @Override
     public void deleteRental(int movieId, int clientId)
     {
         log.trace("Removing rental with id {} {}", movieId, clientId);
@@ -140,7 +137,6 @@ public class RentalControllerImpl implements RentalController
      *
      * @return all: an iterable collection of rentals
      */
-    @Override
     public Iterable<Rental> getRentals()
     {
         log.trace("Retrieving all rentals");
@@ -156,7 +152,6 @@ public class RentalControllerImpl implements RentalController
      * @throws ElementNotFoundException if the movie or client does not exist in the repository or
      *                                  if the rental is nowhere to be found
      */
-    @Override
     public void updateRental(int movieId, int clientId, String time)
     {
         checkRentalID(movieId, clientId);
@@ -179,7 +174,6 @@ public class RentalControllerImpl implements RentalController
                         )));
     }
 
-    @Override
     public Iterable<Rental> filterRentalsByMovieName(String name)
     {
         log.trace("Filtering rentals by the movie name {}", name);

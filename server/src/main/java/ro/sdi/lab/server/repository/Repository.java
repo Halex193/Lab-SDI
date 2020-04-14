@@ -1,10 +1,10 @@
-package ro.sdi.lab.server.repository;
+package ro.sdi.lab24.repository;
 
 import java.io.Serializable;
 import java.util.Optional;
 
-import ro.sdi.lab.common.exception.ValidatorException;
-import ro.sdi.lab.common.model.Entity;
+import ro.sdi.lab24.exception.ValidatorException;
+import ro.sdi.lab24.model.Entity;
 
 /**
  * Interface for generic CRUD operations on a repository for a specific type.
@@ -16,11 +16,9 @@ public interface Repository<ID extends Serializable, T extends Entity<ID>>
     /**
      * Find the entity with the given {@code id}.
      *
-     * @param id
-     *            must be not null.
+     * @param id must be not null.
      * @return an {@code Optional} encapsulating the entity with the given id.
-     * @throws IllegalArgumentException
-     *             if the given id is null.
+     * @throws IllegalArgumentException if the given id is null.
      */
     Optional<T> findOne(ID id);
 

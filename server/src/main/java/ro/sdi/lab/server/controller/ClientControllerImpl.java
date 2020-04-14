@@ -1,4 +1,4 @@
-package ro.sdi.lab.server.controller;
+package ro.sdi.lab24.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,23 +8,22 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import ro.sdi.lab.common.controller.ClientController;
-import ro.sdi.lab.common.exception.AlreadyExistingElementException;
-import ro.sdi.lab.common.exception.ElementNotFoundException;
-import ro.sdi.lab.common.model.Client;
-import ro.sdi.lab.server.repository.Repository;
-import ro.sdi.lab.server.validation.Validator;
+import ro.sdi.lab24.exception.AlreadyExistingElementException;
+import ro.sdi.lab24.exception.ElementNotFoundException;
+import ro.sdi.lab24.model.Client;
+import ro.sdi.lab24.repository.Repository;
+import ro.sdi.lab24.validation.Validator;
 
 @Service
-public class ClientControllerImpl implements ClientController
+public class ClientController
 {
-    public static final Logger log = LoggerFactory.getLogger(ClientControllerImpl.class);
+    public static final Logger log = LoggerFactory.getLogger(ClientController.class);
 
     Repository<Integer, Client> clientRepository;
     Validator<Client> clientValidator;
     EntityDeletedListener<Client> entityDeletedListener = null;
 
-    public ClientControllerImpl(
+    public ClientController(
             Repository<Integer, Client> clientRepository,
             Validator<Client> clientValidator
     )
@@ -45,7 +44,6 @@ public class ClientControllerImpl implements ClientController
      * @param name: the name of the client
      * @throws AlreadyExistingElementException if the client (the ID) is already there
      */
-    @Override
     public void addClient(int id, String name)
     {
         Client client = new Client(id, name);
@@ -68,7 +66,6 @@ public class ClientControllerImpl implements ClientController
      * @param id: the ID of the client
      * @throws ElementNotFoundException if the client isn't found in the repository based on their ID
      */
-    @Override
     public void deleteClient(int id)
     {
         log.trace("Removing client with id {}", id);
@@ -93,7 +90,6 @@ public class ClientControllerImpl implements ClientController
      *
      * @return all: an iterable collection of clients
      */
-    @Override
     public Iterable<Client> getClients()
     {
         log.trace("Retrieving all clients");
@@ -107,7 +103,6 @@ public class ClientControllerImpl implements ClientController
      * @param name: the new name of the client
      * @throws ElementNotFoundException if the client isn't found in the repository based on their ID
      */
-    @Override
     public void updateClient(int id, String name)
     {
         Client client = new Client(id, name);
@@ -121,7 +116,6 @@ public class ClientControllerImpl implements ClientController
                 )));
     }
 
-    @Override
     public Iterable<Client> filterClientsByName(String name)
     {
         log.trace("Filtering clients by the name {}", name);

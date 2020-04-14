@@ -1,4 +1,4 @@
-package ro.sdi.lab.common.model;
+package ro.sdi.lab24.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -14,46 +14,56 @@ public class Rental extends Entity<Rental.RentalID> implements Serializable
         super(new RentalID(0, 0));
     }
 
-    public Rental(int movieId, int clientId, LocalDateTime time) {
+    public Rental(int movieId, int clientId, LocalDateTime time)
+    {
         super(new RentalID(movieId, clientId));
         this.time = time;
     }
 
-    public LocalDateTime getTime() {
+    public LocalDateTime getTime()
+    {
         return time;
     }
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(LocalDateTime time)
+    {
         this.time = time;
     }
 
-    public static class RentalID implements Serializable {
+    public static class RentalID implements Serializable
+    {
         private int movieId;
         private int clientId;
 
-        public RentalID(int movieId, int clientId) {
+        public RentalID(int movieId, int clientId)
+        {
             this.movieId = movieId;
             this.clientId = clientId;
         }
 
-        public int getMovieId() {
+        public int getMovieId()
+        {
             return movieId;
         }
 
-        public int getClientId() {
-            return clientId;
-        }
-
-        public void setMovieId(int movieId) {
+        public void setMovieId(int movieId)
+        {
             this.movieId = movieId;
         }
 
-        public void setClientId(int clientId) {
+        public int getClientId()
+        {
+            return clientId;
+        }
+
+        public void setClientId(int clientId)
+        {
             this.clientId = clientId;
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(Object o)
+        {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             RentalID rentalID = (RentalID) o;

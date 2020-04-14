@@ -1,14 +1,14 @@
-package ro.sdi.lab.server.sorting;
-
-import ro.sdi.lab.common.exception.SortingException;
-import ro.sdi.lab.common.model.Sort;
-import ro.sdi.lab.common.utils.Pair;
+package ro.sdi.lab24.sorting;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import javafx.util.Pair;
+import ro.sdi.lab24.exception.SortingException;
+import ro.sdi.lab24.model.Sort;
 
 public class SortingUtils
 {
@@ -22,7 +22,7 @@ public class SortingUtils
         {
             return Collections.emptyList();
         }
-        List<Pair<Sort.Direction, String>> sortingFields = new LinkedList<Pair<Sort.Direction, String>>(sort.sortingFields);
+        List<Pair<Sort.Direction, String>> sortingFields = new LinkedList<>(sort.sortingFields);
         Collections.reverse(sortingFields);
 
         sortingFields.forEach(

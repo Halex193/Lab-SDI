@@ -1,6 +1,7 @@
-package ro.sdi.lab.common.model.copyadapters;
+package ro.sdi.lab24.model.copyadapters;
 
-import ro.sdi.lab.common.model.Rental;
+
+import ro.sdi.lab24.model.Rental;
 
 public class RentalCopyAdapter implements CopyAdapter<Rental>
 {

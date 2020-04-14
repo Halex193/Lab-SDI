@@ -1,4 +1,4 @@
-package ro.sdi.lab.common.model.copyadapters;
+package ro.sdi.lab24.model.copyadapters;
 
 public interface CopyAdapter<T>
 {

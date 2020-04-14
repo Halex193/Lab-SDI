@@ -1,17 +1,20 @@
-package ro.sdi.lab.common.model.dto;
+package ro.sdi.lab24.model.dto;
 
 import java.io.Serializable;
 
-public class RentedMovieStatistic implements Comparable<RentedMovieStatistic>, Serializable {
+public class RentedMovieStatistic implements Comparable<RentedMovieStatistic>, Serializable
+{
     private String movieName;
     private Long numberOfRentals;
 
-    public RentedMovieStatistic(String movieName, Long numberOfRentals) {
+    public RentedMovieStatistic(String movieName, Long numberOfRentals)
+    {
         this.movieName = movieName;
         this.numberOfRentals = numberOfRentals;
     }
 
-    public RentedMovieStatistic() {
+    public RentedMovieStatistic()
+    {
         this.movieName = "";
         this.numberOfRentals = 0L;
     }
