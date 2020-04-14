@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11">
-      <module name="Lab2-4-SDI.client.main" target="11" />
-      <module name="Lab2-4-SDI.client.test" target="11" />
-      <module name="Lab2-4-SDI.common.main" target="11" />
-      <module name="Lab2-4-SDI.common.test" target="11" />
-      <module name="Lab2-4-SDI.main" target="11" />
-      <module name="Lab2-4-SDI.server.main" target="11" />
-      <module name="Lab2-4-SDI.server.test" target="11" />
-      <module name="Lab2-4-SDI.test" target="11" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.9" />
   </component>
 </project>
