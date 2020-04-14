@@ -1,5 +1,8 @@
 package ro.sdi.lab.server.repository;
 
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -7,25 +10,30 @@ import java.util.Optional;
 import ro.sdi.lab.common.exception.ValidatorException;
 import ro.sdi.lab.common.model.Entity;
 import ro.sdi.lab.common.model.Sort;
-import ro.sdi.lab.server.model.serialization.database.TableAdapter;
+import ro.sdi.lab.common.model.copyadapters.CopyAdapter;
+import ro.sdi.lab.server.repository.tableadapters.TableAdapter;
 import ro.sdi.lab.server.sorting.SortingUtils;
 
-public class DatabaseRepository<ID, T extends Entity<ID>> implements SortingRepository<ID, T>
+public class DatabaseRepository<ID extends Serializable, T extends Entity<ID>>
+        implements SortingRepository<ID, T>
 {
     private TableAdapter<ID, T> tableAdapter;
+    private CopyAdapter<T> copyAdapter;
 
     public DatabaseRepository(
-            TableAdapter<ID, T> tableAdapter
+            TableAdapter<ID, T> tableAdapter,
+            CopyAdapter<T> copyAdapter
     )
     {
         this.tableAdapter = tableAdapter;
+        this.copyAdapter = copyAdapter;
     }
 
     @Override
     public Optional<T> findOne(ID id)
     {
         Objects.requireNonNull(id, "Id must not be null");
-        return tableAdapter.read(id);
+        return tableAdapter.findById(id);
     }
 
     @Override
@@ -38,10 +46,10 @@ public class DatabaseRepository<ID, T extends Entity<ID>> implements SortingRepo
     public Optional<T> save(T entity) throws ValidatorException
     {
         Objects.requireNonNull(entity, "Entity must not be null");
-        Optional<T> readEntity = tableAdapter.read(entity.getId());
+        Optional<T> readEntity = tableAdapter.findById(entity.getId());
         if (readEntity.isEmpty())
         {
-            tableAdapter.insert(entity);
+            tableAdapter.save(entity);
         }
         return readEntity;
     }
@@ -50,33 +58,34 @@ public class DatabaseRepository<ID, T extends Entity<ID>> implements SortingRepo
     public Optional<T> delete(ID id)
     {
         Objects.requireNonNull(id, "Id must not be null");
-        return tableAdapter.read(id).map(
+        return tableAdapter.findById(id).map(
                 readEntity ->
                 {
-                    tableAdapter.delete(id);
+                    tableAdapter.deleteById(id);
                     return readEntity;
                 }
         );
     }
 
     @Override
+    @Transactional
     public Optional<T> update(T entity) throws ValidatorException
     {
         Objects.requireNonNull(entity, "Entity must not be null");
 
-        return tableAdapter.read(entity.getId()).map(
+        return tableAdapter.findById(entity.getId()).map(
                 readEntity ->
                 {
-                    tableAdapter.update(entity);
+                    tableAdapter.findById(entity.getId())
+                                .ifPresent(e -> copyAdapter.copy(entity, e));
                     return entity;
                 }
         );
-
     }
 
     private List<T> getAll()
     {
-        return tableAdapter.readAll();
+        return tableAdapter.findAll();
     }
 
     @Override

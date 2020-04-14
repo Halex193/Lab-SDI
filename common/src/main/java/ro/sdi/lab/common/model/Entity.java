@@ -1,9 +1,15 @@
 package ro.sdi.lab.common.model;
 
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Entity<ID> implements Serializable {
+@MappedSuperclass
+public abstract class Entity<ID extends Serializable> implements Serializable
+{
+
+    @Id
     protected ID id;
 
     public Entity(ID id) {
@@ -14,9 +20,12 @@ public class Entity<ID> implements Serializable {
         return id;
     }
 
+    public void setId(ID id) {
+        this.id = id;
+    }
+
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Entity)) return false;
         Entity<?> entity = (Entity<?>) o;

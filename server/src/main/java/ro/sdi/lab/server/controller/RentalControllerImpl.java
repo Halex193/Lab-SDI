@@ -1,5 +1,9 @@
 package ro.sdi.lab.server.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -14,8 +18,11 @@ import ro.sdi.lab.common.model.Rental;
 import ro.sdi.lab.server.repository.Repository;
 import ro.sdi.lab.server.validation.Validator;
 
+@Service
 public class RentalControllerImpl implements RentalController
 {
+    public static final Logger log = LoggerFactory.getLogger(RentalControllerImpl.class);
+
     private final ClientControllerImpl clientController;
     private final MovieControllerImpl movieController;
     Repository<Rental.RentalID, Rental> rentalRepository;
@@ -70,13 +77,19 @@ public class RentalControllerImpl implements RentalController
         Rental rental;
         try
         {
-            rental = new Rental(movieId, clientId, LocalDateTime.parse(time, formatter));
+            LocalDateTime dateTime;
+            if (time.equals("now"))
+                dateTime = LocalDateTime.now();
+            else
+                dateTime = LocalDateTime.parse(time, formatter);
+            rental = new Rental(movieId, clientId, dateTime);
         }
         catch (DateTimeParseException e)
         {
             throw new DateTimeInvalidException("Date and time invalid");
         }
         rentalValidator.validate(rental);
+        log.trace("Adding rental {}", rental);
         rentalRepository.save(rental)
                         .ifPresent(opt ->
                                    {
@@ -112,6 +125,7 @@ public class RentalControllerImpl implements RentalController
     @Override
     public void deleteRental(int movieId, int clientId)
     {
+        log.trace("Removing rental with id {} {}", movieId, clientId);
         checkRentalID(movieId, clientId);
         rentalRepository.delete(new Rental.RentalID(movieId, clientId))
                         .orElseThrow(() -> new ElementNotFoundException(String.format(
@@ -129,6 +143,7 @@ public class RentalControllerImpl implements RentalController
     @Override
     public Iterable<Rental> getRentals()
     {
+        log.trace("Retrieving all rentals");
         return rentalRepository.findAll();
     }
 
@@ -155,6 +170,7 @@ public class RentalControllerImpl implements RentalController
             throw new DateTimeInvalidException("Date and time invalid");
         }
         rentalValidator.validate(rental);
+        log.trace("Updating rental {}", rental);
         rentalRepository.update(rental)
                         .orElseThrow(() -> new ElementNotFoundException(String.format(
                                 "Rental of movie %d and client %d does not exist",
@@ -166,6 +182,7 @@ public class RentalControllerImpl implements RentalController
     @Override
     public Iterable<Rental> filterRentalsByMovieName(String name)
     {
+        log.trace("Filtering rentals by the movie name {}", name);
         String regex = ".*" + name + ".*";
         return StreamSupport.stream(rentalRepository.findAll().spliterator(), false)
                             .filter(rental -> movieController.findOne(rental.getId().getMovieId())

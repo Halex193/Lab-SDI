@@ -1,9 +1,9 @@
 package ro.sdi.lab.server.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.remoting.rmi.RmiServiceExporter;
-
 import ro.sdi.lab.common.controller.ClientController;
 import ro.sdi.lab.common.controller.Controller;
 import ro.sdi.lab.common.controller.MovieController;
@@ -11,102 +11,89 @@ import ro.sdi.lab.common.controller.RentalController;
 import ro.sdi.lab.common.model.Client;
 import ro.sdi.lab.common.model.Movie;
 import ro.sdi.lab.common.model.Rental;
+import ro.sdi.lab.common.model.copyadapters.ClientCopyAdapter;
+import ro.sdi.lab.common.model.copyadapters.CopyAdapter;
+import ro.sdi.lab.common.model.copyadapters.MovieCopyAdapter;
+import ro.sdi.lab.common.model.copyadapters.RentalCopyAdapter;
 import ro.sdi.lab.common.networking.ServerInformation;
 import ro.sdi.lab.server.controller.ClientControllerImpl;
 import ro.sdi.lab.server.controller.ControllerImpl;
 import ro.sdi.lab.server.controller.MovieControllerImpl;
-import ro.sdi.lab.server.controller.RentalControllerImpl;
-import ro.sdi.lab.server.model.serialization.database.ClientTableAdapter;
-import ro.sdi.lab.server.model.serialization.database.MovieTableAdapter;
-import ro.sdi.lab.server.model.serialization.database.RentalTableAdapter;
 import ro.sdi.lab.server.repository.DatabaseRepository;
 import ro.sdi.lab.server.repository.Repository;
+import ro.sdi.lab.server.repository.tableadapters.ClientTableAdapter;
+import ro.sdi.lab.server.repository.tableadapters.MovieTableAdapter;
+import ro.sdi.lab.server.repository.tableadapters.RentalTableAdapter;
 import ro.sdi.lab.server.validation.ClientValidator;
 import ro.sdi.lab.server.validation.MovieValidator;
 import ro.sdi.lab.server.validation.RentalValidator;
 
 @Configuration
+@ComponentScan({"ro.sdi.lab.server.controller", "ro.sdi.lab.server.repository"})
 public class Config
 {
     @Bean
-    ClientTableAdapter clientTableAdapter()
+    CopyAdapter<Client> clientCopyAdapter()
     {
-        return new ClientTableAdapter();
+        return new ClientCopyAdapter();
     }
 
     @Bean
-    MovieTableAdapter movieTableAdapter()
+    CopyAdapter<Movie> movieCopyAdapter()
     {
-        return new MovieTableAdapter();
+        return new MovieCopyAdapter();
     }
 
     @Bean
-    RentalTableAdapter rentalTableAdapter()
+    CopyAdapter<Rental> rentalCopyAdapter()
     {
-        return new RentalTableAdapter();
+        return new RentalCopyAdapter();
     }
 
-    @Bean
-    Repository<Integer, Client> clientRepository(ClientTableAdapter clientTableAdapter)
-    {
-        return new DatabaseRepository<>(clientTableAdapter);
-    }
 
     @Bean
-    Repository<Integer, Movie> movieRepository(MovieTableAdapter movieTableAdapter)
-    {
-        return new DatabaseRepository<>(movieTableAdapter);
-    }
-
-    @Bean
-    Repository<Rental.RentalID, Rental> rentalRepository(RentalTableAdapter rentalTableAdapter)
-    {
-        return new DatabaseRepository<>(rentalTableAdapter);
-    }
-
-    @Bean
-    ControllerImpl controller(
-            Repository<Integer, Client> clientRepository,
-            Repository<Integer, Movie> movieRepository,
-            Repository<Rental.RentalID, Rental> rentalRepository
+    Repository<Integer, Client> clientRepository(
+            ClientTableAdapter clientTableAdapter,
+            CopyAdapter<Client> clientCopyAdapter
     )
     {
-        return new ControllerImpl(
-                clientRepository,
-                movieRepository,
-                rentalRepository,
-                new ClientValidator(),
-                new MovieValidator(),
-                new RentalValidator()
-        );
-    }
-
-
-    @Bean
-    ClientControllerImpl clientController(Repository<Integer, Client> clientRepository)
-    {
-        return new ClientControllerImpl(clientRepository, new ClientValidator());
+        return new DatabaseRepository<>(clientTableAdapter, clientCopyAdapter);
     }
 
     @Bean
-    MovieControllerImpl movieController(Repository<Integer, Movie> movieRepository)
-    {
-        return new MovieControllerImpl(movieRepository, new MovieValidator());
-    }
-
-    @Bean
-    RentalController rentalController(
-            ClientControllerImpl clientController,
-            MovieControllerImpl movieController,
-            Repository<Rental.RentalID, Rental> rentalRepository
+    Repository<Integer, Movie> movieRepository(
+            MovieTableAdapter movieTableAdapter,
+            CopyAdapter<Movie> movieCopyAdapter
     )
     {
-        return new RentalControllerImpl(
-                clientController,
-                movieController,
-                rentalRepository,
-                new RentalValidator()
-        );
+        return new DatabaseRepository<>(movieTableAdapter, movieCopyAdapter);
+    }
+
+    @Bean
+    Repository<Rental.RentalID, Rental> rentalRepository(
+            RentalTableAdapter rentalTableAdapter,
+            CopyAdapter<Rental> rentalCopyAdapter
+    )
+    {
+        return new DatabaseRepository<>(rentalTableAdapter, rentalCopyAdapter);
+    }
+
+    @Bean
+    RentalValidator rentalValidator()
+    {
+        return new RentalValidator();
+    }
+
+    @Bean
+    MovieValidator movieValidator()
+    {
+        return new MovieValidator();
+    }
+
+    @Bean
+    ClientValidator clientValidator()
+    {
+        return new ClientValidator();
     }
 
     @Bean

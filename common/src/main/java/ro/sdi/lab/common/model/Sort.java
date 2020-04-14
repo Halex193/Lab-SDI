@@ -1,6 +1,6 @@
 package ro.sdi.lab.common.model;
 
-import javafx.util.Pair;
+import ro.sdi.lab.common.utils.Pair;
 
 import java.io.Serializable;
 import java.util.ArrayList;

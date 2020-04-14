@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Client" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="ro.sdi.lab.client.Main" />
-    <module name="Lab2-4-SDI.client.main" />
+    <module name="Lab-SDI.client.main" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="ro.sdi.lab.client.*" />

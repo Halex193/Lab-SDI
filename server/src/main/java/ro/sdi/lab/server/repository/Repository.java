@@ -1,5 +1,6 @@
 package ro.sdi.lab.server.repository;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import ro.sdi.lab.common.exception.ValidatorException;
@@ -9,12 +10,12 @@ import ro.sdi.lab.common.model.Entity;
  * Interface for generic CRUD operations on a repository for a specific type.
  *
  * @author radu.
- *
  */
-public interface Repository<ID, T extends Entity<ID>> {
+public interface Repository<ID extends Serializable, T extends Entity<ID>>
+{
     /**
      * Find the entity with the given {@code id}.
-     * 
+     *
      * @param id
      *            must be not null.
      * @return an {@code Optional} encapsulating the entity with the given id.

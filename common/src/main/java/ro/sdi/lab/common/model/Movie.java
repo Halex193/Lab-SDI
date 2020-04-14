@@ -2,12 +2,20 @@ package ro.sdi.lab.common.model;
 
 import java.io.Serializable;
 
-public class Movie extends Entity<Integer> implements Serializable {
+@javax.persistence.Entity
+public class Movie extends Entity<Integer> implements Serializable
+{
     private String name;
     private String genre;
     private int rating;
 
-    public Movie(int id, String name, String genre, int rating) {
+    public Movie()
+    {
+        super(0);
+    }
+
+    public Movie(int id, String name, String genre, int rating)
+    {
         super(id);
         this.name = name;
         this.genre = genre;
@@ -19,19 +27,28 @@ public class Movie extends Entity<Integer> implements Serializable {
         return name;
     }
 
-    public String getGenre()
-    {
+    public String getGenre() {
         return genre;
     }
 
-    public int getRating()
-    {
+    public int getRating() {
         return rating;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         return String.format("Movie[%d, %s, %s, %d]", id, name, genre, rating);
     }
 }

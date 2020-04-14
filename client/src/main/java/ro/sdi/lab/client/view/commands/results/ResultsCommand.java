@@ -1,5 +1,7 @@
 package ro.sdi.lab.client.view.commands.results;
 
+import java.util.List;
+
 import picocli.CommandLine;
 import ro.sdi.lab.client.view.Console;
 
@@ -9,6 +11,12 @@ public class ResultsCommand implements Runnable
     @Override
     public void run()
     {
-        System.out.println(String.join("\n", Console.responseBuffer.getResponses()));
+        List<String> responses = Console.responseBuffer.getResponses();
+        if (responses.isEmpty())
+        {
+            System.out.println("No results pending!");
+            return;
+        }
+        System.out.println(String.join("\n", responses));
     }
 }

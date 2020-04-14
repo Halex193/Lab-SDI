@@ -24,4 +24,4 @@ javadoc/
 #angular
 node_modules
 
-database.properties
+server/src/main/resources/local

@@ -10,8 +10,15 @@ public class ResponseBuffer
 {
     private List<FutureResponse<?>> responseList = new LinkedList<>();
 
-    protected static final int DELAY_SECONDS = 10;
     private Timer timer;
+    private int delaySeconds;
+    private boolean timerActivation;
+
+    public ResponseBuffer(int delaySeconds, boolean timerActivation)
+    {
+        this.delaySeconds = delaySeconds;
+        this.timerActivation = timerActivation;
+    }
 
     public synchronized List<String> getResponses()
     {
@@ -35,8 +42,11 @@ public class ResponseBuffer
         responseList.add(futureResponse);
         if (timer != null)
             timer.cancel();
-        timer = new Timer();
-        timer.schedule(new ShowResponsesTask(this), DELAY_SECONDS * 1000);
+        if (timerActivation)
+        {
+            timer = new Timer();
+            timer.schedule(new ShowResponsesTask(this), delaySeconds * 1000);
+        }
     }
 
     static class ShowResponsesTask extends TimerTask
