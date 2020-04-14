@@ -1,9 +1,16 @@
 package ro.sdi.lab24.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Entity<ID>
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
+public abstract class Entity<ID extends Serializable> implements Serializable
 {
+
+    @Id
     protected ID id;
 
     public Entity(ID id)
@@ -14,6 +21,11 @@ public class Entity<ID>
     public ID getId()
     {
         return id;
+    }
+
+    public void setId(ID id)
+    {
+        this.id = id;
     }
 
     @Override

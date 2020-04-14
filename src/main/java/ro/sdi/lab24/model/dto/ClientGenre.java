@@ -1,8 +1,11 @@
-package ro.sdi.lab24.controller.dto;
+package ro.sdi.lab24.model.dto;
+
+import java.io.Serializable;
 
 import ro.sdi.lab24.model.Client;
 
-public class ClientGenre
+
+public class ClientGenre implements Serializable
 {
     private Client client;
     private String genre;

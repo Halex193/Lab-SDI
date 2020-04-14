@@ -1,24 +1,77 @@
-plugins {
-    id 'java'
-    id 'application'
-}
 
-group 'ro.sdi.lab2-4'
-version '1.0'
+    apply plugin: 'java'
+    apply plugin: 'application'
 
-repositories {
-    mavenCentral()
-}
+    group 'ro.sdi.lab9'
+    version '1.0'
+
+    ext {
+        springVersion = '5.1.6.RELEASE'
+        postgresqlVersion = '42.2.11'
+        dbcpVersion = '2.6.0'
+
+        slf4jVersion = '1.7.25'
+        log4jVersion = '2.10.0'
+
+        springDataVersion = '2.1.6.RELEASE'
+        hibernateVersion = '5.4.2.Final'
+        hikariVersion = '2.7.7'
+        jaxbapiVersion = '2.3.0'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+
+    dependencies {
+        //junit
+        testCompile 'org.junit.jupiter:junit-jupiter:5.4.2'
+
+        //spring
+        compile group: 'org.springframework', name: 'spring-context', version: "$springVersion"
+
+        //logging
+        compile group: 'org.slf4j', name: 'slf4j-api', version: "$slf4jVersion"
+        testCompile group: 'org.slf4j', name: 'slf4j-simple', version: "$slf4jVersion"
+
+        compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: "$log4jVersion"
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "$log4jVersion"
+        compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: "$log4jVersion"
+
+        //jpa
+        compile group: 'org.springframework', name: 'spring-context-support', version: "$springVersion"
+        compile group: 'org.springframework', name: 'spring-orm', version: "$springVersion"
+        compile group: 'org.springframework.data', name: 'spring-data-jpa', version: "$springDataVersion"
+
+        compile group: 'org.postgresql', name: 'postgresql', version: "$postgresqlVersion"
+
+        compile group: 'com.zaxxer', name: 'HikariCP', version: "$hikariVersion"
+
+        compile group: 'javax.xml.bind', name: 'jaxb-api', version: "$jaxbapiVersion"
+
+        compile group: 'org.hibernate', name: 'hibernate-core', version:"$hibernateVersion"
+
+        implementation 'info.picocli:picocli:4.2.0'
+    }
+
+    jar {
+        from {
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
+
+    run {
+        standardInput = System.in
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+
 
 application {
     mainClassName = "ro.sdi.lab24.Main"
-}
-
-dependencies {
-    implementation 'info.picocli:picocli:4.2.0'
-    testCompile 'org.junit.jupiter:junit-jupiter:5.4.2'
-    // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.11'
 }
 
 jar {
@@ -27,15 +80,4 @@ jar {
                 'Main-Class': 'ro.sdi.lab24.Main'
         )
     }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
-run {
-    standardInput = System.in
-}
-
-test {
-    useJUnitPlatform()
 }

@@ -1,12 +1,6 @@
 package ro.sdi.lab24.view;
 
-import picocli.CommandLine;
-import ro.sdi.lab24.controller.ClientController;
-import ro.sdi.lab24.controller.Controller;
-import ro.sdi.lab24.controller.MovieController;
-import ro.sdi.lab24.controller.RentalController;
-import ro.sdi.lab24.exception.ProgramException;
-import ro.sdi.lab24.view.commands.MovieRentalCommand;
+import org.springframework.stereotype.Component;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,6 +9,15 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import picocli.CommandLine;
+import ro.sdi.lab24.controller.ClientController;
+import ro.sdi.lab24.controller.Controller;
+import ro.sdi.lab24.controller.MovieController;
+import ro.sdi.lab24.controller.RentalController;
+import ro.sdi.lab24.exception.ProgramException;
+import ro.sdi.lab24.view.commands.MovieRentalCommand;
+
+@Component
 public class Console
 {
     public static Controller controller;
@@ -22,7 +25,7 @@ public class Console
     public static MovieController movieController;
     public static RentalController rentalController;
 
-    public static void initialize(
+    public Console(
             Controller controller,
             ClientController clientController,
             MovieController movieController,

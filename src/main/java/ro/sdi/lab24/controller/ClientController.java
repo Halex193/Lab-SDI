@@ -1,5 +1,9 @@
 package ro.sdi.lab24.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -10,8 +14,11 @@ import ro.sdi.lab24.model.Client;
 import ro.sdi.lab24.repository.Repository;
 import ro.sdi.lab24.validation.Validator;
 
+@Service
 public class ClientController
 {
+    public static final Logger log = LoggerFactory.getLogger(ClientController.class);
+
     Repository<Integer, Client> clientRepository;
     Validator<Client> clientValidator;
     EntityDeletedListener<Client> entityDeletedListener = null;
@@ -41,6 +48,7 @@ public class ClientController
     {
         Client client = new Client(id, name);
         clientValidator.validate(client);
+        log.trace("Adding client {}", client);
         clientRepository
                 .save(client)
                 .ifPresent(opt ->
@@ -60,6 +68,7 @@ public class ClientController
      */
     public void deleteClient(int id)
     {
+        log.trace("Removing client with id {}", id);
         clientRepository
                 .delete(id)
                 .ifPresentOrElse(
@@ -83,6 +92,7 @@ public class ClientController
      */
     public Iterable<Client> getClients()
     {
+        log.trace("Retrieving all clients");
         return clientRepository.findAll();
     }
 
@@ -97,6 +107,7 @@ public class ClientController
     {
         Client client = new Client(id, name);
         clientValidator.validate(client);
+        log.trace("Updating client {}", client);
         clientRepository
                 .update(client)
                 .orElseThrow(() -> new ElementNotFoundException(String.format(
@@ -107,6 +118,7 @@ public class ClientController
 
     public Iterable<Client> filterClientsByName(String name)
     {
+        log.trace("Filtering clients by the name {}", name);
         String regex = ".*" + name + ".*";
         return StreamSupport
                 .stream(clientRepository.findAll().spliterator(), false)

@@ -1,45 +1,39 @@
 package ro.sdi.lab24.repository;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
-import ro.sdi.lab24.exception.DatabaseException;
 import ro.sdi.lab24.exception.ValidatorException;
 import ro.sdi.lab24.model.Entity;
-import ro.sdi.lab24.model.serialization.database.TableAdapter;
-import ro.sdi.lab24.sorting.Sort;
+import ro.sdi.lab24.model.Sort;
+import ro.sdi.lab24.model.copyadapters.CopyAdapter;
+import ro.sdi.lab24.repository.tableadapters.TableAdapter;
 import ro.sdi.lab24.sorting.SortingUtils;
 
-public class DatabaseRepository<ID, T extends Entity<ID>> implements SortingRepository<ID, T>
+public class DatabaseRepository<ID extends Serializable, T extends Entity<ID>>
+        implements SortingRepository<ID, T>
 {
-    private Supplier<Connection> connectionSupplier;
     private TableAdapter<ID, T> tableAdapter;
+    private CopyAdapter<T> copyAdapter;
 
     public DatabaseRepository(
-            Supplier<Connection> connectionSupplier,
-            TableAdapter<ID, T> tableAdapter
+            TableAdapter<ID, T> tableAdapter,
+            CopyAdapter<T> copyAdapter
     )
     {
-        this.connectionSupplier = connectionSupplier;
         this.tableAdapter = tableAdapter;
+        this.copyAdapter = copyAdapter;
     }
 
     @Override
     public Optional<T> findOne(ID id)
     {
         Objects.requireNonNull(id, "Id must not be null");
-        try (Connection connection = connectionSupplier.get())
-        {
-            return tableAdapter.read(id, connection);
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException("Database connection error");
-        }
+        return tableAdapter.findById(id);
     }
 
     @Override
@@ -52,85 +46,46 @@ public class DatabaseRepository<ID, T extends Entity<ID>> implements SortingRepo
     public Optional<T> save(T entity) throws ValidatorException
     {
         Objects.requireNonNull(entity, "Entity must not be null");
-        try (Connection connection = connectionSupplier.get())
+        Optional<T> readEntity = tableAdapter.findById(entity.getId());
+        if (readEntity.isEmpty())
         {
-            Optional<T> readEntity = tableAdapter.read(entity.getId(), connection);
-            if (readEntity.isEmpty())
-            {
-                tableAdapter.insert(entity, connection);
-            }
-            return readEntity;
+            tableAdapter.save(entity);
         }
-        catch (SQLException e)
-        {
-            throw new DatabaseException("Database connection error");
-        }
+        return readEntity;
     }
 
     @Override
     public Optional<T> delete(ID id)
     {
         Objects.requireNonNull(id, "Id must not be null");
-        try (Connection connection = connectionSupplier.get())
-        {
-            return tableAdapter.read(id, connection).map(
-                    readEntity ->
-                    {
-                        try
-                        {
-                            tableAdapter.delete(id, connection);
-                        }
-                        catch (SQLException e)
-                        {
-                            throw new DatabaseException("Database connection error");
-                        }
-                        return readEntity;
-                    }
-            );
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException("Database connection error");
-        }
+        return tableAdapter.findById(id).map(
+                readEntity ->
+                {
+                    tableAdapter.deleteById(id);
+                    return readEntity;
+                }
+        );
     }
 
     @Override
+    @Transactional
     public Optional<T> update(T entity) throws ValidatorException
     {
         Objects.requireNonNull(entity, "Entity must not be null");
-        try (Connection connection = connectionSupplier.get())
-        {
-            return tableAdapter.read(entity.getId(), connection).map(
-                    readEntity ->
-                    {
-                        try
-                        {
-                            tableAdapter.update(entity, connection);
-                        }
-                        catch (SQLException e)
-                        {
-                            throw new DatabaseException("Database connection error");
-                        }
-                        return entity;
-                    }
-            );
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException("Database connection error");
-        }
+
+        return tableAdapter.findById(entity.getId()).map(
+                readEntity ->
+                {
+                    tableAdapter.findById(entity.getId())
+                                .ifPresent(e -> copyAdapter.copy(entity, e));
+                    return entity;
+                }
+        );
     }
 
     private List<T> getAll()
     {
-        try (Connection connection = connectionSupplier.get())
-        {
-            return tableAdapter.readAll(connection);
-        }
-        catch (SQLException e)
-        {
-            throw new DatabaseException("Database connection error");
-        }
+        return tableAdapter.findAll();
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javafx.util.Pair;
 import ro.sdi.lab24.exception.SortingException;
+import ro.sdi.lab24.model.Sort;
 
 public class SortingUtils
 {

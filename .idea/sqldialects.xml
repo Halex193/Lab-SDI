@@ -2,8 +2,5 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/db.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/ro/sdi/lab24/model/serialization/database/ClientTableAdapter.java" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/ro/sdi/lab24/model/serialization/database/MovieTableAdapter.java" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/src/main/java/ro/sdi/lab24/model/serialization/database/RentalTableAdapter.java" dialect="PostgreSQL" />
   </component>
 </project>

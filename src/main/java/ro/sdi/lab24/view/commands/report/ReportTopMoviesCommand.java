@@ -1,8 +1,8 @@
 package ro.sdi.lab24.view.commands.report;
 
 import picocli.CommandLine.Command;
-import ro.sdi.lab24.controller.dto.RentedMovieStatistic;
 import ro.sdi.lab24.exception.ProgramException;
+import ro.sdi.lab24.model.dto.RentedMovieStatistic;
 import ro.sdi.lab24.view.Console;
 
 @Command(description = "Top 10 rented movies", name = "topmovies")

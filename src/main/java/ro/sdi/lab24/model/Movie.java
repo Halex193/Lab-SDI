@@ -1,10 +1,18 @@
 package ro.sdi.lab24.model;
 
-public class Movie extends Entity<Integer>
+import java.io.Serializable;
+
+@javax.persistence.Entity
+public class Movie extends Entity<Integer> implements Serializable
 {
     private String name;
     private String genre;
     private int rating;
+
+    public Movie()
+    {
+        super(0);
+    }
 
     public Movie(int id, String name, String genre, int rating)
     {
@@ -24,9 +32,24 @@ public class Movie extends Entity<Integer>
         return genre;
     }
 
+    public void setGenre(String genre)
+    {
+        this.genre = genre;
+    }
+
     public int getRating()
     {
         return rating;
+    }
+
+    public void setRating(int rating)
+    {
+        this.rating = rating;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     @Override

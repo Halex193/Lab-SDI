@@ -1,9 +1,12 @@
 package ro.sdi.lab24.view.commands.movie;
 
+import java.util.Arrays;
+
 import picocli.CommandLine;
 import ro.sdi.lab24.exception.ProgramException;
 import ro.sdi.lab24.exception.SortingException;
 import ro.sdi.lab24.model.Movie;
+import ro.sdi.lab24.model.Sort;
 import ro.sdi.lab24.view.Console;
 import ro.sdi.lab24.view.commands.movie.utils.SortingCriteria;
 
@@ -24,10 +27,17 @@ public class SortMoviesCommand implements Runnable {
 
     @Override
     public void run() {
-        try {
+        try
+        {
             SortingCriteria[] criteria = convertStringsToCriteria();
-            Iterable<Movie> movies = Console.movieController.sortMovies(criteria);
-            if (!movies.iterator().hasNext()) {
+            Sort reducedSort = Arrays.stream(criteria, 0, criteria.length)
+                                     .map(sort -> new Sort(sort.getDirection(), sort.getField()))
+                                     .reduce(Sort::and)
+                                     .orElseThrow(() -> new SortingException(
+                                             "no sorting criteria provided"));
+            Iterable<Movie> movies = Console.movieController.sortMovies(reducedSort);
+            if (!movies.iterator().hasNext())
+            {
                 System.out.println("No movies found!");
             }
             movies.forEach(

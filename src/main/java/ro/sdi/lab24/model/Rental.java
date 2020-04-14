@@ -1,11 +1,18 @@
 package ro.sdi.lab24.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class Rental extends Entity<Rental.RentalID>
+@javax.persistence.Entity
+public class Rental extends Entity<Rental.RentalID> implements Serializable
 {
     private LocalDateTime time;
+
+    public Rental()
+    {
+        super(new RentalID(0, 0));
+    }
 
     public Rental(int movieId, int clientId, LocalDateTime time)
     {
@@ -18,7 +25,12 @@ public class Rental extends Entity<Rental.RentalID>
         return time;
     }
 
-    public static class RentalID
+    public void setTime(LocalDateTime time)
+    {
+        this.time = time;
+    }
+
+    public static class RentalID implements Serializable
     {
         private int movieId;
         private int clientId;
@@ -34,13 +46,24 @@ public class Rental extends Entity<Rental.RentalID>
             return movieId;
         }
 
+        public void setMovieId(int movieId)
+        {
+            this.movieId = movieId;
+        }
+
         public int getClientId()
         {
             return clientId;
         }
 
+        public void setClientId(int clientId)
+        {
+            this.clientId = clientId;
+        }
+
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(Object o)
+        {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             RentalID rentalID = (RentalID) o;

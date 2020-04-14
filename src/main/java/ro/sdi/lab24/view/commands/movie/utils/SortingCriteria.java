@@ -1,6 +1,6 @@
 package ro.sdi.lab24.view.commands.movie.utils;
 
-import ro.sdi.lab24.sorting.Sort;
+import ro.sdi.lab24.model.Sort;
 
 public class SortingCriteria {
     private String field;

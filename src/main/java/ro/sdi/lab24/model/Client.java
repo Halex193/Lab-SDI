@@ -1,8 +1,16 @@
 package ro.sdi.lab24.model;
 
-public class Client extends Entity<Integer>
+import java.io.Serializable;
+
+@javax.persistence.Entity
+public class Client extends Entity<Integer> implements Serializable
 {
     private String name;
+
+    public Client()
+    {
+        super(0);
+    }
 
     public Client(int id, String name)
     {
@@ -13,6 +21,11 @@ public class Client extends Entity<Integer>
     public String getName()
     {
         return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     @Override
