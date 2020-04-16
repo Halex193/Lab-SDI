@@ -1,8 +1,11 @@
 package ro.sdi.lab.web.converter;
 
+import org.springframework.stereotype.Component;
+
 import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.web.dto.ClientDto;
 
+@Component
 public class ClientConverter implements Converter<Client, ClientDto>
 {
 

@@ -3,7 +3,6 @@ subprojects {
     version '1.0-SNAPSHOT'
 
     apply plugin: 'java'
-    apply plugin: 'application'
 
     sourceCompatibility = JavaVersion.VERSION_11
 
@@ -54,30 +53,8 @@ subprojects {
 
 
     }
-    jar {
-        from {
-            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        }
-    }
-
-    run {
-        standardInput = System.in
-    }
 
     test {
         useJUnitPlatform()
     }
-
-
-    /*application {
-        mainClassName = "ro.sdi.lab24.Main"
-    }
-
-    jar {
-        manifest {
-            attributes(
-                    'Main-Class': 'ro.sdi.lab24.Main'
-            )
-        }
-    }*/
 }

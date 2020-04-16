@@ -15,6 +15,9 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -51,6 +54,14 @@ public class JPAConfig
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        try
+        {
+            DriverManager.registerDriver(new org.postgresql.Driver());
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
         HikariDataSource dataSource = new HikariDataSource(config);
         return dataSource;
     }
@@ -65,7 +76,7 @@ public class JPAConfig
 
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(vendorAdapter);
-        factory.setPackagesToScan("ro.sdi.lab24.model");
+        factory.setPackagesToScan("ro.sdi.lab.core.model");
         factory.setDataSource(dataSource());
         factory.afterPropertiesSet();
         return factory.getObject();

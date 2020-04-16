@@ -34,6 +34,12 @@ public class ClientController
     private ClientConverter clientConverter;
 
 
+    @RequestMapping(value = "/clients", method = GET)
+    public ClientsDto getClients()
+    {
+        return new ClientsDto(clientConverter.toDtos(clientService.getClients()));
+    }
+
     @RequestMapping(value = "/clients", method = POST)
     public ResponseEntity<?> addClient(@RequestBody ClientDto clientDto)
     {
@@ -49,12 +55,6 @@ public class ClientController
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-
-    @RequestMapping(value = "/clients", method = GET)
-    public ClientsDto getClients()
-    {
-        return new ClientsDto(clientConverter.toDtos(clientService.getClients()));
-    }
 
     @RequestMapping(value = "/clients/{id}", method = PUT)
     public ResponseEntity<?> updateClient(@PathVariable int id, @RequestBody ClientDto clientDto)
