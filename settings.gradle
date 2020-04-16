@@ -1,2 +1,5 @@
-rootProject.name = 'Lab2-4-SDI'
+rootProject.name = 'Lab-SDI'
+include 'core'
+include 'web'
+include 'client'
 
