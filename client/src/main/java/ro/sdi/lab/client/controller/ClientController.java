@@ -1,7 +1,5 @@
 package ro.sdi.lab.client.controller;
 
-import java.util.Optional;
-
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Client;
@@ -61,10 +59,5 @@ public class ClientController
     public Iterable<Client> filterClientsByName(String name)
     {
         return null;
-    }
-
-    public Optional<Client> findOne(int clientId)
-    {
-        return Optional.empty();
     }
 }

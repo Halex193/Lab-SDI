@@ -1,4 +1,4 @@
-package ro.sdi.lab.core.controller;
+package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +15,15 @@ import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
 @Service
-public class ClientController
+public class ClientService
 {
-    public static final Logger log = LoggerFactory.getLogger(ClientController.class);
+    public static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
     Repository<Integer, Client> clientRepository;
     Validator<Client> clientValidator;
     EntityDeletedListener<Client> entityDeletedListener = null;
 
-    public ClientController(
+    public ClientService(
             Repository<Integer, Client> clientRepository,
             Validator<Client> clientValidator
     )

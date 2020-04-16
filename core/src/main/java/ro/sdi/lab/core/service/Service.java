@@ -1,8 +1,7 @@
-package ro.sdi.lab.core.controller;
+package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -19,10 +18,10 @@ import ro.sdi.lab.core.model.dto.RentedMovieStatistic;
 import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
-@Service
-public class Controller
+@org.springframework.stereotype.Service
+public class Service
 {
-    public static final Logger log = LoggerFactory.getLogger(Controller.class);
+    public static final Logger log = LoggerFactory.getLogger(Service.class);
 
     Repository<Integer, Client> clientRepository;
     Repository<Integer, Movie> movieRepository;
@@ -31,7 +30,7 @@ public class Controller
     Validator<Movie> movieValidator;
     Validator<Rental> rentalValidator;
 
-    public Controller(
+    public Service(
             Repository<Integer, Client> clientRepository,
             Repository<Integer, Movie> movieRepository,
             Repository<Rental.RentalID, Rental> rentalRepository,

@@ -1,4 +1,6 @@
-package ro.sdi.lab.client.controller;
+package ro.sdi.lab.web.controller;
+
+import java.util.Optional;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
@@ -66,6 +68,11 @@ public class MovieController
     }
 
     public Iterable<Movie> filterMoviesByGenre(String genre)
+    {
+        return null;
+    }
+
+    public Optional<Movie> findOne(int movieId)
     {
         return null;
     }

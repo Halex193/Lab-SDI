@@ -1,4 +1,4 @@
-package ro.sdi.lab.core.controller;
+package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,25 +18,25 @@ import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
 @Service
-public class RentalController
+public class RentalService
 {
-    public static final Logger log = LoggerFactory.getLogger(RentalController.class);
+    public static final Logger log = LoggerFactory.getLogger(RentalService.class);
 
-    private final ClientController clientController;
-    private final MovieController movieController;
+    private final ClientService clientService;
+    private final MovieService movieService;
     Repository<Rental.RentalID, Rental> rentalRepository;
     Validator<Rental> rentalValidator;
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    public RentalController(
-            ClientController clientController,
-            MovieController movieController,
+    public RentalService(
+            ClientService clientService,
+            MovieService movieService,
             Repository<Rental.RentalID, Rental> rentalRepository,
             Validator<Rental> rentalValidator
     )
     {
-        this.clientController = clientController;
-        this.movieController = movieController;
+        this.clientService = clientService;
+        this.movieService = movieService;
         this.rentalRepository = rentalRepository;
         this.rentalValidator = rentalValidator;
         setupCascadeDeletion();
@@ -44,14 +44,14 @@ public class RentalController
 
     private void setupCascadeDeletion()
     {
-        clientController.setEntityDeletedListener(
+        clientService.setEntityDeletedListener(
                 client -> StreamSupport
                         .stream(rentalRepository.findAll().spliterator(), false)
                         .filter(rental -> rental.getId().getClientId() == client.getId())
                         .forEach(rental -> rentalRepository.delete(rental.getId()))
         );
 
-        movieController.setEntityDeletedListener(
+        movieService.setEntityDeletedListener(
                 movie -> StreamSupport
                         .stream(rentalRepository.findAll().spliterator(), false)
                         .filter(rental -> rental.getId().getMovieId() == movie.getId())
@@ -101,16 +101,16 @@ public class RentalController
 
     private void checkRentalID(int movieId, int clientId)
     {
-        movieController.findOne(movieId)
-                       .orElseThrow(() -> new ElementNotFoundException(String.format(
-                               "Movie %d does not exist",
-                               movieId
-                       )));
-        clientController.findOne(clientId)
-                        .orElseThrow(() -> new ElementNotFoundException(String.format(
-                                "Client %d does not exist",
-                                clientId
-                        )));
+        movieService.findOne(movieId)
+                    .orElseThrow(() -> new ElementNotFoundException(String.format(
+                            "Movie %d does not exist",
+                            movieId
+                    )));
+        clientService.findOne(clientId)
+                     .orElseThrow(() -> new ElementNotFoundException(String.format(
+                             "Client %d does not exist",
+                             clientId
+                     )));
     }
 
     /**
@@ -179,10 +179,10 @@ public class RentalController
         log.trace("Filtering rentals by the movie name {}", name);
         String regex = ".*" + name + ".*";
         return StreamSupport.stream(rentalRepository.findAll().spliterator(), false)
-                            .filter(rental -> movieController.findOne(rental.getId().getMovieId())
-                                                             .filter(t -> t.getName()
-                                                                           .matches(regex))
-                                                             .isPresent())
+                            .filter(rental -> movieService.findOne(rental.getId().getMovieId())
+                                                          .filter(t -> t.getName()
+                                                                        .matches(regex))
+                                                          .isPresent())
                             .collect(Collectors.toUnmodifiableList());
     }
 }

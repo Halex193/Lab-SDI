@@ -1,4 +1,4 @@
-package ro.sdi.lab.core.controller;
+package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +18,15 @@ import ro.sdi.lab.core.repository.SortingRepository;
 import ro.sdi.lab.core.validation.Validator;
 
 @Service
-public class MovieController
+public class MovieService
 {
-    public static final Logger log = LoggerFactory.getLogger(MovieController.class);
+    public static final Logger log = LoggerFactory.getLogger(MovieService.class);
 
     Repository<Integer, Movie> movieRepository;
     Validator<Movie> movieValidator;
     EntityDeletedListener<Movie> entityDeletedListener = null;
 
-    public MovieController(
+    public MovieService(
             Repository<Integer, Movie> movieRepository,
             Validator<Movie> movieValidator
     )
