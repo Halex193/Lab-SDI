@@ -13,7 +13,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode
-public class ClientsDto
+public class MoviesDto
 {
-    private Set<ClientDto> clients;
+    Set<MovieDto> movies;
 }

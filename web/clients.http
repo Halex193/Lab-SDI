@@ -1,4 +1,16 @@
-GET http://localhost:8080/api/clients/1
+POST http://localhost:8080/api/clients
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Name"
+}
+
+###
+GET http://localhost:8080/api/clients
 
 ###
 GET http://localhost:8080/api/clients/filter/Andrei
+
+###
+DELETE http://localhost:8080/api/clients/5

@@ -1,8 +1,7 @@
 package ro.sdi.lab.web.dto;
 
-import java.util.Set;
-
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -11,9 +10,13 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@ToString
 @EqualsAndHashCode
-public class ClientsDto
+@ToString
+@Builder
+public class MovieDto
 {
-    private Set<ClientDto> clients;
+    int id;
+    private String name;
+    private String genre;
+    private int rating;
 }

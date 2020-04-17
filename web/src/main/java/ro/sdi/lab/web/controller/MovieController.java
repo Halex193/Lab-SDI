@@ -1,30 +1,51 @@
 package ro.sdi.lab.web.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Optional;
 
-import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Sort;
+import ro.sdi.lab.core.service.MovieService;
+import ro.sdi.lab.web.converter.MovieConverter;
+import ro.sdi.lab.web.dto.MovieDto;
+import ro.sdi.lab.web.dto.MoviesDto;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
+@RestController
 public class MovieController
 {
 
-    public MovieController()
-    {
+    public static final Logger log = LoggerFactory.getLogger(MovieController.class);
 
+    @Autowired
+    private MovieService movieService;
+
+    @Autowired
+    private MovieConverter movieConverter;
+
+    @RequestMapping(value = "/movies", method = GET)
+    public MoviesDto getMovies()
+    {
+        Iterable<Movie> movies = movieService.getMovies();
+        log.trace("Get movies: {}", movies);
+        return new MoviesDto(movieConverter.toDtos(movies));
     }
 
-    /**
-     * This function adds a movie to the repository
-     *
-     * @param id:   the ID of the movie
-     * @param name: the name of the movie
-     * @throws AlreadyExistingElementException if the movie (the ID) is already there
-     */
-    public void addMovie(int id, String name, String genre, int rating)
+    @RequestMapping(value = "/movies", method = POST)
+    public ResponseEntity<?> addMovie(@RequestBody MovieDto movieDto)
     {
-
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);//TODO
     }
 
     /**
@@ -36,16 +57,6 @@ public class MovieController
     public void deleteMovie(int id)
     {
 
-    }
-
-    /**
-     * This function returns an iterable collection of the current state of the movies in the repository
-     *
-     * @return all: an iterable collection of movies
-     */
-    public Iterable<Movie> getMovies()
-    {
-        return null;
     }
 
     /**

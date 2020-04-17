@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ro.sdi.lab.core.exception.AlreadyExistingElementException;
+import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.service.ClientService;
 import ro.sdi.lab.web.converter.ClientConverter;
@@ -24,7 +26,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @RestController
 public class ClientController
 {
-
     public static final Logger log = LoggerFactory.getLogger(ClientController.class);
 
     @Autowired
@@ -37,21 +38,41 @@ public class ClientController
     @RequestMapping(value = "/clients", method = GET)
     public ClientsDto getClients()
     {
-        return new ClientsDto(clientConverter.toDtos(clientService.getClients()));
+        Iterable<Client> clients = clientService.getClients();
+        log.trace("Get clients: {}", clients);
+        return new ClientsDto(clientConverter.toDtos(clients));
     }
 
     @RequestMapping(value = "/clients", method = POST)
     public ResponseEntity<?> addClient(@RequestBody ClientDto clientDto)
     {
         Client client = clientConverter.toModel(clientDto);
-        clientService.addClient(client.getId(), client.getName());
+        try
+        {
+            clientService.addClient(client.getId(), client.getName());
+        }
+        catch (AlreadyExistingElementException e)
+        {
+            log.trace("Client {} already exists", client);
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        log.trace("Client {} added", client);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/clients/{id}", method = DELETE)
     public ResponseEntity<?> deleteClient(@PathVariable int id)
     {
-        clientService.deleteClient(id);
+        try
+        {
+            clientService.deleteClient(id);
+        }
+        catch (ElementNotFoundException e)
+        {
+            log.trace("Client with id {} could not be deleted", id);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        log.trace("Client with id {} was deleted", id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -59,7 +80,17 @@ public class ClientController
     @RequestMapping(value = "/clients/{id}", method = PUT)
     public ResponseEntity<?> updateClient(@PathVariable int id, @RequestBody ClientDto clientDto)
     {
-        clientService.updateClient(id, clientConverter.toModel(clientDto).getName());
+        Client client = clientConverter.toModel(clientDto);
+        try
+        {
+            clientService.updateClient(id, client.getName());
+        }
+        catch (ElementNotFoundException e)
+        {
+            log.trace("Client with id {} could not be updated", id);
+            e.printStackTrace();
+        }
+        log.trace("Client with id {} was updated: {}", id, client);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
