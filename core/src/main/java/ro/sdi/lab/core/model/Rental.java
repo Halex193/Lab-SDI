@@ -35,6 +35,8 @@ public class Rental extends Entity<Rental.RentalID> implements Serializable
         private int movieId;
         private int clientId;
 
+        private static final long serialVersionUID = 1L;
+
         public RentalID(int movieId, int clientId)
         {
             this.movieId = movieId;
