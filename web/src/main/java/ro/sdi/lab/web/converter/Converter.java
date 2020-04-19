@@ -4,9 +4,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import ro.sdi.lab.core.model.Entity;
-
-public interface Converter<Model extends Entity<?>, Dto>
+public interface Converter<Model, Dto>
 {
     Model toModel(Dto dto);
 

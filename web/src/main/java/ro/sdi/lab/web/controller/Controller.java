@@ -1,32 +1,38 @@
 package ro.sdi.lab.web.controller;
 
-import ro.sdi.lab.core.model.Rental;
-import ro.sdi.lab.core.model.dto.ClientGenre;
-import ro.sdi.lab.core.model.dto.RentedMovieStatistic;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import ro.sdi.lab.core.service.Service;
+import ro.sdi.lab.web.converter.ClientGenreConverter;
+import ro.sdi.lab.web.converter.RentedMovieStatisticConverter;
+import ro.sdi.lab.web.dto.ClientGenresDto;
+import ro.sdi.lab.web.dto.RentedMovieStatisticsDto;
+
+@RestController
 public class Controller
 {
 
-    public Controller()
-    {
+    @Autowired
+    private Service service;
 
+    @Autowired
+    private RentedMovieStatisticConverter rentedMovieStatisticConverter;
+
+    @Autowired
+    private ClientGenreConverter clientGenreConverter;
+
+    @RequestMapping(value = "/statistics/movies", method = RequestMethod.GET)
+    public RentedMovieStatisticsDto getTop10RentedMovies()
+    {
+        return new RentedMovieStatisticsDto(rentedMovieStatisticConverter.toDtos(service.getTop10RentedMovies()));
     }
 
-    public Iterable<RentedMovieStatistic> getTop10RentedMovies()
+    @RequestMapping(value = "/statistics/genres", method = RequestMethod.GET)
+    public ClientGenresDto getClientGenres()
     {
-        return null;
-    }
-
-    /**
-     * Retrieves the most rented genre for each client, or the empty string if the client did not rent any movies
-     */
-    public Iterable<ClientGenre> getClientGenres()
-    {
-        return null;
-    }
-
-    private String getMovieGenre(Rental rental)
-    {
-        return null;
+        return new ClientGenresDto(clientGenreConverter.toDtos(service.getClientGenres()));
     }
 }
