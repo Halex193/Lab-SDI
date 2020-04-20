@@ -1,0 +1,27 @@
+target
+classes
+bin
+*.log
+dist
+files
+
+# Eclipse
+.classpath
+.project
+.settings
+.metadata
+
+# IntelliJ IDEA
+build
+out
+generated
+MANIFEST.MF
+javadoc/
+
+#gradle
+.gradle
+
+#angular
+node_modules
+
+database.properties
