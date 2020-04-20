@@ -2,11 +2,8 @@ package ro.sdi.lab.client.view.commands.client;
 
 import picocli.CommandLine;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
-
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import ro.sdi.lab.core.exception.ProgramException;
+import ro.sdi.lab.core.model.Client;
 
 @CommandLine.Command(description = "Filter clients by name", name = "filter")
 public class FilterClientsCommand implements Runnable
@@ -15,21 +12,20 @@ public class FilterClientsCommand implements Runnable
     String name;
 
     @Override
-    public void run() {
-        String name = this.name;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.clientController.filterClientsByName(name),
-                        new ResponseMapper<>(response -> {
-                            if (!response.iterator().hasNext()) {
-                                return "No clients found!";
-                            }
-                            return String.format("Filtered clients by name = %s\n", name) +
-                                    StreamSupport.stream(response.spliterator(), false)
-                                            .map(client -> String.format("%d %s", client.getId(), client.getName()))
-                                            .collect(Collectors.joining("\n", "", "\n"));
-                        })
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Iterable<Client> filteredClients = Console.clientController.filterClientsByName(name);
+            if (!filteredClients.iterator().hasNext())
+            {
+                System.out.println("No clients found!");
+            }
+            filteredClients.forEach(
+                    client -> System.out.printf("%d %s\n", client.getId(), client.getName())
+            );
+        } catch (ProgramException e) {
+            Console.handleException(e);
+        }
     }
 }

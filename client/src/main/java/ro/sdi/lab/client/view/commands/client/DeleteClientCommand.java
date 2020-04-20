@@ -3,8 +3,7 @@ package ro.sdi.lab.client.view.commands.client;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
+import ro.sdi.lab.core.exception.ProgramException;
 
 @Command(description = "Delete a client", name = "delete")
 public class DeleteClientCommand implements Runnable
@@ -13,13 +12,16 @@ public class DeleteClientCommand implements Runnable
     int id;
 
     @Override
-    public void run() {
-        int id = this.id;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.clientController.deleteClient(id),
-                        new ResponseMapper<>(response -> String.format("Client %d deleted!", id))
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Console.clientController.deleteClient(id);
+            System.out.println("Client deleted!");
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

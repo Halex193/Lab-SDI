@@ -1,17 +1,20 @@
-package ro.sdi.lab24.view.commands.movie.utils;
+package ro.sdi.lab.client.view.commands.movie.utils;
 
-import ro.sdi.lab24.model.Sort;
+import ro.sdi.lab.core.model.Sort;
 
-public class SortingCriteria {
-    private String field;
-    private String direction;
+public class SortingCriteria
+{
+    private final String field;
+    private final String direction;
 
-    public SortingCriteria(String field, String direction) {
+    public SortingCriteria(String field, String direction)
+    {
         this.field = field;
         this.direction = direction;
     }
 
-    public String getField() {
+    public String getField()
+    {
         return field;
     }
 

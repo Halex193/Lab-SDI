@@ -4,7 +4,6 @@ import ro.sdi.lab.client.view.commands.client.ClientCommand;
 import ro.sdi.lab.client.view.commands.movie.MovieCommand;
 import ro.sdi.lab.client.view.commands.rental.RentalCommand;
 import ro.sdi.lab.client.view.commands.report.ReportCommand;
-import ro.sdi.lab.client.view.commands.results.ResultsCommand;
 
 import static picocli.CommandLine.Command;
 
@@ -13,13 +12,14 @@ import static picocli.CommandLine.Command;
                 ClientCommand.class,
                 MovieCommand.class,
                 RentalCommand.class,
-                ReportCommand.class,
-                ResultsCommand.class
+                ReportCommand.class
         },
         mixinStandardHelpOptions = true)
-public class MovieRentalCommand implements Runnable {
-    @Override
-    public void run() {
-        System.out.println("Use a command!");
-    }
+public class MovieRentalCommand implements Runnable
+{
+        @Override
+        public void run()
+        {
+                System.out.println("Use a command!");
+        }
 }

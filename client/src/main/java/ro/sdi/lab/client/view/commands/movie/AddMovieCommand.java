@@ -3,8 +3,7 @@ package ro.sdi.lab.client.view.commands.movie;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
+import ro.sdi.lab.core.exception.ProgramException;
 
 @Command(description = "Adds a movie", name = "add")
 public class AddMovieCommand implements Runnable
@@ -22,16 +21,16 @@ public class AddMovieCommand implements Runnable
     int rating;
 
     @Override
-    public void run() {
-        int id = this.id;
-        String name = this.name;
-        String genre = this.genre;
-        int rating = this.rating;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.movieController.addMovie(id, name, genre, rating),
-                        new ResponseMapper<>(response -> String.format("Movie %d,%s,%s,%d added!", id, name, genre, rating))
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Console.movieController.addMovie(id, name, genre, rating);
+            System.out.println("Movie added!");
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

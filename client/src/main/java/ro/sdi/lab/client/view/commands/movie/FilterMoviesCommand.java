@@ -1,11 +1,9 @@
 package ro.sdi.lab.client.view.commands.movie;
 
-import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
 
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import ro.sdi.lab.client.view.Console;
+import ro.sdi.lab.core.exception.ProgramException;
+import ro.sdi.lab.core.model.Movie;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Parameters;
@@ -17,21 +15,28 @@ public class FilterMoviesCommand implements Runnable
     String genre;
 
     @Override
-    public void run() {
-        String genre = this.genre;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.movieController.filterMoviesByGenre(genre),
-                        new ResponseMapper<>(response -> {
-                            if (!response.iterator().hasNext()) {
-                                return "No movies found!";
-                            }
-                            return String.format("Movies filtered by genre = %s\n", genre) +
-                                    StreamSupport.stream(response.spliterator(), false)
-                                            .map(movie -> String.format("%d %s %s %d", movie.getId(), movie.getName(), movie.getGenre(), movie.getRating()))
-                                            .collect(Collectors.joining("\n", "", "\n"));
-                        })
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Iterable<Movie> filteredMovies = Console.movieController.filterMoviesByGenre(genre);
+            if (!filteredMovies.iterator().hasNext())
+            {
+                System.out.println("No movies found!");
+            }
+            filteredMovies.forEach(
+                    movie -> System.out.printf(
+                            "%d %s %s %d\n",
+                            movie.getId(),
+                            movie.getName(),
+                            movie.getGenre(),
+                            movie.getRating()
+                    )
+            );
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

@@ -1,17 +1,8 @@
-application {
-    mainClassName = "ro.sdi.lab24.Main"
-}
-
 dependencies {
+    compile project(':web')
     implementation 'info.picocli:picocli:4.2.0'
-    implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
-    implementation project(":common")
-}
+    compile group: 'org.springframework', name: 'spring-web', version: "$springVersion"
 
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'ro.sdi.lab24.Main'
-        )
-    }
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "$jacksonDatabindVersion"
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "$jacksonDatabindVersion"
 }

@@ -3,8 +3,7 @@ package ro.sdi.lab.client.view.commands.client;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
+import ro.sdi.lab.core.exception.ProgramException;
 
 @Command(description = "Update a client", name = "update")
 public class UpdateClientCommand implements Runnable
@@ -16,14 +15,16 @@ public class UpdateClientCommand implements Runnable
     String name;
 
     @Override
-    public void run() {
-        int id = this.id;
-        String name = this.name;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.clientController.updateClient(id, name),
-                        new ResponseMapper<>(response -> String.format("Client %d updated (new name: %s)!", id, name))
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Console.clientController.updateClient(id, name);
+            System.out.println("Client updated!");
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

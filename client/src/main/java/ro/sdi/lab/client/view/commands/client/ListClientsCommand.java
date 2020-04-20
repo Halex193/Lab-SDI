@@ -2,30 +2,30 @@ package ro.sdi.lab.client.view.commands.client;
 
 import picocli.CommandLine.Command;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
+import ro.sdi.lab.core.exception.ProgramException;
+import ro.sdi.lab.core.model.Client;
 
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Command(description = "List all clients", name = "list")
 public class ListClientsCommand implements Runnable
 {
     @Override
-    public void run() {
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.clientController.getClients(),
-                        new ResponseMapper<>(response -> {
-                            if (!response.iterator().hasNext()) {
-                                return "No clients found!";
-                            }
-                            return "List of clients\n" +
-                                    StreamSupport.stream(response.spliterator(), false)
-                                            .map(client -> String.format("%d %s", client.getId(), client.getName()))
-                                            .collect(Collectors.joining("\n", "", "\n"));
-                        })
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Iterable<Client> clients = Console.clientController.getClients();
+            if (!clients.iterator().hasNext())
+            {
+                System.out.println("No clients found!");
+            }
+            clients.forEach(
+                    client -> System.out.printf("%d %s\n", client.getId(), client.getName())
+            );
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

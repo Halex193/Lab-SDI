@@ -1,5 +1,5 @@
 rootProject.name = 'Lab-SDI'
+include 'core'
+include 'web'
 include 'client'
-include 'server'
-include 'common'
 

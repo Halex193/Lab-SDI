@@ -1,34 +1,41 @@
+subprojects {
+    group 'ro.sdi.lab'
+    version '1.0-SNAPSHOT'
 
     apply plugin: 'java'
-    apply plugin: 'application'
 
-    group 'ro.sdi.lab9'
-    version '1.0'
-
-    ext {
-        springVersion = '5.1.6.RELEASE'
-        postgresqlVersion = '42.2.11'
-        dbcpVersion = '2.6.0'
-
-        slf4jVersion = '1.7.25'
-        log4jVersion = '2.10.0'
-
-        springDataVersion = '2.1.6.RELEASE'
-        hibernateVersion = '5.4.2.Final'
-        hikariVersion = '2.7.7'
-        jaxbapiVersion = '2.3.0'
-    }
+    sourceCompatibility = JavaVersion.VERSION_11
 
     repositories {
         mavenCentral()
     }
 
 
-    dependencies {
-        //junit
-        testCompile 'org.junit.jupiter:junit-jupiter:5.4.2'
+    ext {
+        springVersion = '5.0.3.RELEASE'
+        postgresqlVersion = '42.2.1'
+        dbcpVersion = '2.2.0'
 
-        //spring
+        slf4jVersion = '1.7.25'
+        log4jVersion = '2.10.0'
+
+        springDataVersion = '2.0.3.RELEASE'
+        hibernateVersion = '5.2.6.Final'
+        caffeineVersion = '2.6.1'
+        hikariVersion = '2.7.7'
+        jaxbapiVersion = '2.3.0'
+
+        jacksonDatabindVersion = '2.9.4'
+//        javaxServeletApiVersion = '3.1.0'
+        javaxServeletApiVersion = '4.0.1'
+
+        lombokVersion = '1.18.12'
+    }
+
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+
         compile group: 'org.springframework', name: 'spring-context', version: "$springVersion"
 
         //logging
@@ -39,45 +46,15 @@
         compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "$log4jVersion"
         compile group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: "$log4jVersion"
 
-        //jpa
-        compile group: 'org.springframework', name: 'spring-context-support', version: "$springVersion"
-        compile group: 'org.springframework', name: 'spring-orm', version: "$springVersion"
-        compile group: 'org.springframework.data', name: 'spring-data-jpa', version: "$springDataVersion"
+        //lombok
+//        compile group: 'org.projectlombok', name: 'lombok', version: "$lombokVersion"
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-        compile group: 'org.postgresql', name: 'postgresql', version: "$postgresqlVersion"
 
-        compile group: 'com.zaxxer', name: 'HikariCP', version: "$hikariVersion"
-
-        compile group: 'javax.xml.bind', name: 'jaxb-api', version: "$jaxbapiVersion"
-
-        compile group: 'org.hibernate', name: 'hibernate-core', version:"$hibernateVersion"
-
-        implementation 'info.picocli:picocli:4.2.0'
-    }
-
-    jar {
-        from {
-            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-        }
-    }
-
-    run {
-        standardInput = System.in
     }
 
     test {
         useJUnitPlatform()
-    }
-
-
-application {
-    mainClassName = "ro.sdi.lab24.Main"
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'ro.sdi.lab24.Main'
-        )
     }
 }

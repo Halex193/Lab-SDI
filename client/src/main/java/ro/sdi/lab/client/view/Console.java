@@ -1,75 +1,69 @@
 package ro.sdi.lab.client.view;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import picocli.CommandLine;
-import ro.sdi.lab.client.controller.FutureClientController;
-import ro.sdi.lab.client.controller.FutureController;
-import ro.sdi.lab.client.controller.FutureMovieController;
-import ro.sdi.lab.client.controller.FutureRentalController;
-import ro.sdi.lab.client.view.commands.MovieRentalCommand;
-import ro.sdi.lab.common.exception.ProgramException;
 
-import javax.annotation.PostConstruct;
 import java.io.PrintWriter;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import picocli.CommandLine;
+import ro.sdi.lab.client.controller.ClientController;
+import ro.sdi.lab.client.controller.Controller;
+import ro.sdi.lab.client.controller.MovieController;
+import ro.sdi.lab.client.controller.RentalController;
+import ro.sdi.lab.client.view.commands.MovieRentalCommand;
+import ro.sdi.lab.core.exception.ProgramException;
+
 @Component
-public class Console {
-    public static FutureController controller;
-    public static FutureClientController clientController;
-    public static FutureMovieController movieController;
-    public static FutureRentalController rentalController;
-    public static DateTimeFormatter dateFormatter;
-    public static ResponseBuffer responseBuffer;
+public class Console
+{
+    public static Controller controller;
+    public static ClientController clientController;
+    public static MovieController movieController;
+    public static RentalController rentalController;
 
-    @Autowired
-    private FutureController autowiredController;
-    @Autowired
-    private FutureClientController autowiredClientController;
-    @Autowired
-    private FutureMovieController autowiredMovieController;
-    @Autowired
-    private FutureRentalController autowiredRentalController;
-    @Autowired
-    private DateTimeFormatter autowiredDateFormatter;
-    @Autowired
-    private ResponseBuffer autowiredResponseBuffer;
-
-    @PostConstruct
-    private void initialize() {
-        Console.controller = autowiredController;
-        Console.clientController = autowiredClientController;
-        Console.movieController = autowiredMovieController;
-        Console.rentalController = autowiredRentalController;
-        Console.dateFormatter = autowiredDateFormatter;
-        Console.responseBuffer = autowiredResponseBuffer;
+    public Console(
+            Controller controller,
+            ClientController clientController,
+            MovieController movieController,
+            RentalController rentalController
+    )
+    {
+        Console.controller = controller;
+        Console.clientController = clientController;
+        Console.movieController = movieController;
+        Console.rentalController = rentalController;
     }
 
-    public static String handleException(ProgramException e) {
-        return e.getMessage();
+    public static void handleException(ProgramException e)
+    {
+        System.out.println(e.getMessage());
     }
 
-    public static void run(String[] args) {
+    public static void run(String[] args)
+    {
         System.out.println("Movie rental software");
         CommandLine commandLine = new CommandLine(MovieRentalCommand.class);
         commandLine.setUnmatchedOptionsArePositionalParams(true);
         commandLine.setErr(new PrintWriter(System.out));
-        if (args.length == 0) {
+        if (args.length == 0)
+        {
             Scanner scanner = new Scanner(System.in);
             System.out.print("> ");
-            while (scanner.hasNextLine()) {
+            while (scanner.hasNextLine())
+            {
                 String line = scanner.nextLine();
-                if (line.equals("exit")) {
+                if (line.equals("exit"))
+                {
                     break;
-                } else if (!line.matches("^(movie|rental|client|report|results|--help|-h).*")) {
+                } else if (!line.matches("^(movie|rental|client|report|--help|-h).*"))
+                {
                     System.out.println("Invalid command! Type '--help'");
-                } else {
+                } else
+                {
                     commandLine.execute(parseLine(line));
                 }
                 System.out.print("> ");
@@ -81,18 +75,23 @@ public class Console {
         System.exit(exitCode);
     }
 
-    protected static String[] parseLine(String line) {
+    protected static String[] parseLine(String line)
+    {
         List<String> matchList = new ArrayList<String>();
         Pattern regex = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
         Matcher regexMatcher = regex.matcher(line);
-        while (regexMatcher.find()) {
-            if (regexMatcher.group(1) != null) {
+        while (regexMatcher.find())
+        {
+            if (regexMatcher.group(1) != null)
+            {
                 // Add double-quoted string without the quotes
                 matchList.add(regexMatcher.group(1));
-            } else if (regexMatcher.group(2) != null) {
+            } else if (regexMatcher.group(2) != null)
+            {
                 // Add single-quoted string without the quotes
                 matchList.add(regexMatcher.group(2));
-            } else {
+            } else
+            {
                 // Add unquoted word
                 matchList.add(regexMatcher.group());
             }

@@ -3,8 +3,7 @@ package ro.sdi.lab.client.view.commands.rental;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
+import ro.sdi.lab.core.exception.ProgramException;
 
 @Command(description = "Delete rental", name = "delete")
 public class DeleteRentalCommand implements Runnable
@@ -16,14 +15,16 @@ public class DeleteRentalCommand implements Runnable
     int clientId;
 
     @Override
-    public void run() {
-        int movieId = this.movieId;
-        int clientId = this.clientId;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.rentalController.deleteRental(movieId, clientId),
-                        new ResponseMapper<>(response -> String.format("Rental %d,%d deleted!", movieId, clientId))
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Console.rentalController.deleteRental(movieId, clientId);
+            System.out.println("Rental deleted!");
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

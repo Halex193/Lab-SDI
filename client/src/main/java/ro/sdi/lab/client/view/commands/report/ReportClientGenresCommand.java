@@ -2,30 +2,33 @@ package ro.sdi.lab.client.view.commands.report;
 
 import picocli.CommandLine.Command;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
-
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import ro.sdi.lab.core.exception.ProgramException;
+import ro.sdi.lab.core.model.dto.ClientGenre;
 
 @Command(description = "Shows the most watched genre for each client", name = "clientgenres")
 public class ReportClientGenresCommand implements Runnable
 {
     @Override
-    public void run() {
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.controller.getClientGenres(),
-                        new ResponseMapper<>(response -> {
-                            if (!response.iterator().hasNext()) {
-                                return "No client - favourite genre data found!";
-                            }
-                            return "Most watched genre for each client\n" +
-                                    StreamSupport.stream(response.spliterator(), false)
-                                            .map(clientGenre -> String.format("%s - %s", clientGenre.getClient(), clientGenre.getGenre()))
-                                            .collect(Collectors.joining("\n", "", "\n"));
-                        })
-                )
-        );
+    public void run()
+    {
+        try
+        {
+            Iterable<ClientGenre> clientGenres = Console.controller.getClientGenres();
+            if (!clientGenres.iterator().hasNext())
+            {
+                System.out.println("No clients found!");
+            }
+            clientGenres.forEach(
+                    clientGenre -> System.out.printf(
+                            "%s - %s\n",
+                            clientGenre.getClient().getName(),
+                            clientGenre.getGenre()
+                    )
+            );
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }

@@ -3,8 +3,7 @@ package ro.sdi.lab.client.view.commands.client;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import ro.sdi.lab.client.view.Console;
-import ro.sdi.lab.client.view.FutureResponse;
-import ro.sdi.lab.client.view.ResponseMapper;
+import ro.sdi.lab.core.exception.ProgramException;
 
 @Command(description = "Add a client", name = "add")
 public class AddClientCommand implements Runnable
@@ -18,13 +17,14 @@ public class AddClientCommand implements Runnable
     @Override
     public void run()
     {
-        int id = this.id;
-        String name = this.name;
-        Console.responseBuffer.add(
-                new FutureResponse<>(
-                        Console.clientController.addClient(id, name),
-                        new ResponseMapper<>(response -> String.format("Client %d,%s added!", id, name))
-                )
-        );
+        try
+        {
+            Console.clientController.addClient(id, name);
+            System.out.println("Client added!");
+        }
+        catch (ProgramException e)
+        {
+            Console.handleException(e);
+        }
     }
 }
