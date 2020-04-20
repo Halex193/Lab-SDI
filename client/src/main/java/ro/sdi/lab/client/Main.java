@@ -15,6 +15,5 @@ public class Main
                 new AnnotationConfigApplicationContext("ro.sdi.lab.client.config");
 
         Console.run(args);
-        context.getBean(ExecutorService.class).shutdown();
     }
 }
