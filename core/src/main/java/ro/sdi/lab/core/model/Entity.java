@@ -15,7 +15,7 @@ public abstract class Entity<ID extends Serializable> implements Serializable
 
     public Entity(ID id)
     {
-        this.id = id;
+        setId(id);
     }
 
     public ID getId()

@@ -11,7 +11,7 @@
         <module name="Lab-SDI.web.main" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.9">
+    <bytecodeTargetLevel target="11">
       <module name="Lab-SDI.main" target="14" />
       <module name="Lab-SDI.test" target="14" />
     </bytecodeTargetLevel>

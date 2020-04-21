@@ -4,10 +4,25 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+
 @javax.persistence.Entity
 public class Rental extends Entity<Rental.RentalID> implements Serializable
 {
     private LocalDateTime time;
+
+    @Column()
+    private int movieId;
+    @Column
+    private int clientId;
+
+    @Override
+    public void setId(RentalID rentalID)
+    {
+        movieId = rentalID.movieId;
+        clientId = rentalID.clientId;
+        super.setId(rentalID);
+    }
 
     public Rental()
     {
