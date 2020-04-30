@@ -1,0 +1,12 @@
+<h2>Clients</h2>
+<ul>
+  <li *ngFor="let client of clients"
+      [class.selected]="client === selectedClient"
+      (click)="onSelect(client)">
+    {{client.id}}-{{client.name}}
+    <button
+      [class.delete]="true"
+      (click)="deleteClient(client);$event.stopPropagation()">X
+    </button>
+  </li>
+</ul>
