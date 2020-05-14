@@ -105,7 +105,7 @@ public class RentalController
                     "Rental with id {} could not be updated",
                     new Rental.RentalID(movieId, clientId)
             );
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.trace(
                 "Rental with id {} was updated: {}",

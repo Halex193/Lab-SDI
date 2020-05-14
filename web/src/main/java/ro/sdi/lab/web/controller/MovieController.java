@@ -95,7 +95,7 @@ public class MovieController
         catch (ElementNotFoundException e)
         {
             log.trace("Movie with id {} could not be updated", id);
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.trace("Movie with id {} was updated: {}", id, movie);
         return new ResponseEntity<>(HttpStatus.OK);

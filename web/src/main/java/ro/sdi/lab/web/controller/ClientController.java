@@ -89,7 +89,7 @@ public class ClientController
         catch (ElementNotFoundException e)
         {
             log.trace("Client with id {} could not be updated", id);
-            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.trace("Client with id {} was updated: {}", id, client);
         return new ResponseEntity<>(HttpStatus.OK);
