@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.service.ClientService;
 import ro.sdi.lab.web.converter.ClientConverter;
 import ro.sdi.lab.web.dto.ClientDto;
-import ro.sdi.lab.web.dto.ClientsDto;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -36,11 +37,11 @@ public class ClientController
 
 
     @RequestMapping(value = "/clients", method = GET)
-    public ClientsDto getClients()
+    public List<ClientDto> getClients()
     {
         Iterable<Client> clients = clientService.getClients();
         log.trace("Get clients: {}", clients);
-        return new ClientsDto(clientConverter.toDtos(clients));
+        return clientConverter.toDtos(clients);
     }
 
     @RequestMapping(value = "/clients", method = POST)
@@ -95,8 +96,8 @@ public class ClientController
     }
 
     @RequestMapping(value = "/clients/filter/{name}", method = GET)
-    public ClientsDto filterClientsByName(@PathVariable String name)
+    public List<ClientDto> filterClientsByName(@PathVariable String name)
     {
-        return new ClientsDto(clientConverter.toDtos(clientService.filterClientsByName(name)));
+        return clientConverter.toDtos(clientService.filterClientsByName(name));
     }
 }

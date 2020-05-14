@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
@@ -18,7 +19,6 @@ import ro.sdi.lab.core.model.Rental;
 import ro.sdi.lab.core.service.RentalService;
 import ro.sdi.lab.web.converter.RentalConverter;
 import ro.sdi.lab.web.dto.RentalDto;
-import ro.sdi.lab.web.dto.RentalsDto;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -40,11 +40,11 @@ public class RentalController
 
 
     @RequestMapping(value = "/rentals", method = GET)
-    public RentalsDto getRentals()
+    public List<RentalDto> getRentals()
     {
         Iterable<Rental> rentals = rentalService.getRentals();
         log.trace("Get rentals: {}", rentals);
-        return new RentalsDto(rentalConverter.toDtos(rentals));
+        return rentalConverter.toDtos(rentals);
     }
 
     @RequestMapping(value = "/rentals", method = POST)
@@ -116,8 +116,8 @@ public class RentalController
     }
 
     @RequestMapping(value = "/rentals/filter/{name}", method = GET)
-    public RentalsDto filterRentalsByMovieName(String name)
+    public List<RentalDto> filterRentalsByMovieName(String name)
     {
-        return new RentalsDto(rentalConverter.toDtos(rentalService.filterRentalsByMovieName(name)));
+        return rentalConverter.toDtos(rentalService.filterRentalsByMovieName(name));
     }
 }

@@ -5,11 +5,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import ro.sdi.lab.core.service.Service;
 import ro.sdi.lab.web.converter.ClientGenreConverter;
 import ro.sdi.lab.web.converter.RentedMovieStatisticConverter;
-import ro.sdi.lab.web.dto.ClientGenresDto;
-import ro.sdi.lab.web.dto.RentedMovieStatisticsDto;
+import ro.sdi.lab.web.dto.ClientGenreDto;
+import ro.sdi.lab.web.dto.RentedMovieStatisticDto;
 
 @RestController
 public class Controller
@@ -25,14 +27,14 @@ public class Controller
     private ClientGenreConverter clientGenreConverter;
 
     @RequestMapping(value = "/statistics/movies", method = RequestMethod.GET)
-    public RentedMovieStatisticsDto getTop10RentedMovies()
+    public List<RentedMovieStatisticDto> getTop10RentedMovies()
     {
-        return new RentedMovieStatisticsDto(rentedMovieStatisticConverter.toDtos(service.getTop10RentedMovies()));
+        return rentedMovieStatisticConverter.toDtos(service.getTop10RentedMovies());
     }
 
     @RequestMapping(value = "/statistics/genres", method = RequestMethod.GET)
-    public ClientGenresDto getClientGenres()
+    public List<ClientGenreDto> getClientGenres()
     {
-        return new ClientGenresDto(clientGenreConverter.toDtos(service.getClientGenres()));
+        return clientGenreConverter.toDtos(service.getClientGenres());
     }
 }

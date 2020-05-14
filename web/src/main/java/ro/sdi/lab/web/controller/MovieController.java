@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Movie;
@@ -17,7 +19,6 @@ import ro.sdi.lab.core.model.Sort;
 import ro.sdi.lab.core.service.MovieService;
 import ro.sdi.lab.web.converter.MovieConverter;
 import ro.sdi.lab.web.dto.MovieDto;
-import ro.sdi.lab.web.dto.MoviesDto;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -37,11 +38,11 @@ public class MovieController
     private MovieConverter movieConverter;
 
     @RequestMapping(value = "/movies", method = GET)
-    public MoviesDto getMovies()
+    public List<MovieDto> getMovies()
     {
         Iterable<Movie> movies = movieService.getMovies();
         log.trace("Get movies: {}", movies);
-        return new MoviesDto(movieConverter.toDtos(movies));
+        return movieConverter.toDtos(movies);
     }
 
     @RequestMapping(value = "/movies", method = POST)
@@ -101,14 +102,14 @@ public class MovieController
     }
 
     @RequestMapping(value = "/movies/filter/{genre}", method = GET)
-    public MoviesDto filterMoviesByGenre(@PathVariable String genre)
+    public List<MovieDto> filterMoviesByGenre(@PathVariable String genre)
     {
-        return new MoviesDto(movieConverter.toDtos(movieService.filterMoviesByGenre(genre)));
+        return movieConverter.toDtos(movieService.filterMoviesByGenre(genre));
     }
 
     @RequestMapping(value = "/clients/sort", method = POST)
-    public MoviesDto sortMovies(@RequestBody Sort criteria)
+    public List<MovieDto> sortMovies(@RequestBody Sort criteria)
     {
-        return new MoviesDto(movieConverter.toDtos(movieService.sortMovies(criteria)));
+        return movieConverter.toDtos(movieService.sortMovies(criteria));
     }
 }
