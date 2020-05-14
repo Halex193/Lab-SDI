@@ -14,3 +14,9 @@ GET http://localhost:8080/api/clients/filter/Andrei
 
 ###
 DELETE http://localhost:8080/api/clients/5
+
+###
+PUT http://localhost:8080/api/clients/1
+Content-Type: application/json
+
+{"id":1,"name":"Mihai2"}

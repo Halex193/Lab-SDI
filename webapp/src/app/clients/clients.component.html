@@ -1,12 +1,32 @@
 <h2>Clients</h2>
+<span class="error">{{errorMessage}}</span>
 <ul>
-  <li *ngFor="let client of clients"
-      [class.selected]="client === selectedClient"
+  <li *ngFor="let client of items"
       (click)="onSelect(client)">
-    {{client.id}}-{{client.name}}
+    Id:{{client.id}} | Name:{{client.name}}
     <button
       [class.delete]="true"
-      (click)="deleteClient(client);$event.stopPropagation()">X
+      (click)="delete(client);$event.stopPropagation()">X
     </button>
   </li>
+
 </ul>
+<button
+  (click)="update();$event.stopPropagation()">Update
+</button>
+<button
+  (click)="add();$event.stopPropagation()">Add
+</button>
+<div *ngIf="formItem">
+
+  <div>
+    <label>Id:
+      <input [(ngModel)]="formItem.id" placeholder="Id"/>
+    </label>
+  </div>
+  <div>
+    <label>Name:
+      <input [(ngModel)]="formItem.name" placeholder="Name"/>
+    </label>
+  </div>
+</div>

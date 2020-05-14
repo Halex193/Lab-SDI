@@ -1,46 +1,31 @@
-import { Component, OnInit } from '@angular/core';
-import {Client} from "./client.model";
+import {Component} from '@angular/core';
 import {ClientService} from "./client.service";
 import {Router} from "@angular/router";
+import {ItemComponent} from "../shared/ItemComponent";
+import {Client} from "./client.model";
 
 @Component({
   selector: 'app-clients',
   templateUrl: './clients.component.html',
   styleUrls: ['./clients.component.css']
 })
-export class ClientsComponent implements OnInit {
-  errorMessage: string;
-  clients: Array<Client>;
-  selectedClient: Client;
+export class ClientsComponent extends ItemComponent<Client>
+{
 
-  constructor(private clientService: ClientService,
-              private router: Router) {
+  constructor(clientService: ClientService, router: Router)
+  {
+    super(clientService, router, "Client");
+    this.formItem = new Client()
   }
 
-  ngOnInit(): void {
-    this.getClients();
+  getId(client: Client)
+  {
+    return client.id.toString()
   }
 
-  getClients() {
-    this.clientService.getClients()
-      .subscribe(
-        clients => this.clients = clients,
-        error => this.errorMessage = <any>error
-      );
-  }
-
-  onSelect(client: Client): void {
-    this.selectedClient = client;
-  }
-
-  deleteClient(client: Client) {
-    console.log("deleting client: ", client);
-
-    this.clientService.deleteClient(client.id)
-      .subscribe(_ => {
-        console.log("client deleted");
-
-        this.getClients()
-      });
+  copyItem(client: Client)
+  {
+    this.formItem.id = client.id
+    this.formItem.name = client.name
   }
 }
