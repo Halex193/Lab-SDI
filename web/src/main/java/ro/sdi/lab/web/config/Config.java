@@ -47,24 +47,6 @@ public class Config
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean
-    CopyAdapter<Client> clientCopyAdapter()
-    {
-        return new ClientCopyAdapter();
-    }
-
-    @Bean
-    CopyAdapter<Movie> movieCopyAdapter()
-    {
-        return new MovieCopyAdapter();
-    }
-
-    @Bean
-    CopyAdapter<Rental> rentalCopyAdapter()
-    {
-        return new RentalCopyAdapter();
-    }
-
 
     @Bean
     Repository<Integer, Client> clientRepository(

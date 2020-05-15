@@ -5,13 +5,15 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import javax.persistence.Column;
+import javax.validation.constraints.PastOrPresent;
 
 @javax.persistence.Entity
 public class Rental extends Entity<Rental.RentalID> implements Serializable
 {
+    @PastOrPresent
     private LocalDateTime time;
 
-    @Column()
+    @Column
     private int movieId;
     @Column
     private int clientId;

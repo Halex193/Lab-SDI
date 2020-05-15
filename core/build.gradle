@@ -13,4 +13,9 @@ dependencies {
     compile group: 'com.zaxxer', name: 'HikariCP', version: "$hikariVersion"
 
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: "$jaxbapiVersion"
+
+    //Hibernate validation
+    compile 'org.hibernate:hibernate-validator:6.1.5.Final'
+    compile 'org.glassfish:jakarta.el:3.0.3'
+    compile 'org.hibernate.validator:hibernate-validator-cdi:6.1.5.Final'
 }

@@ -5,11 +5,14 @@ import java.util.Objects;
 
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @MappedSuperclass
 public abstract class Entity<ID extends Serializable> implements Serializable
 {
 
+    @NotNull(message = "Invalid id")
     @Id
     protected ID id;
 

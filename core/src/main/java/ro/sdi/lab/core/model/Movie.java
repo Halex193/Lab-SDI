@@ -2,11 +2,22 @@ package ro.sdi.lab.core.model;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
 @javax.persistence.Entity
 public class Movie extends Entity<Integer> implements Serializable
 {
+    @NotNull
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Invalid movie name")
     private String name;
+    @NotNull
     private String genre;
+    @NotNull
+    @Min(0)
+    @Max(100)
     private int rating;
 
     public Movie()

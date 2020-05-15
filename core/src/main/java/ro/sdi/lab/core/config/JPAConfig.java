@@ -21,6 +21,9 @@ import java.sql.SQLException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 @Configuration
 @EnableJpaRepositories({"ro.sdi.lab.core.repository.tableadapters"})
@@ -102,5 +105,11 @@ public class JPAConfig
         return new HibernateExceptionTranslator();
     }
 
+    @Bean
+    Validator validator()
+    {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        return factory.getValidator();
+    }
 
 }
