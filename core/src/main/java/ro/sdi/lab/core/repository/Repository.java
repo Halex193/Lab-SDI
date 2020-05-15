@@ -1,6 +1,10 @@
 package ro.sdi.lab.core.repository;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 
 import ro.sdi.lab.core.exception.ValidatorException;
@@ -64,4 +68,6 @@ public interface Repository<ID extends Serializable, T extends Entity<ID>>
      *             if the entity is not valid.
      */
     Optional<T> update(T entity) throws ValidatorException;
+
+    List<T> findAll(Specification<T> specification, Pageable pageable);
 }

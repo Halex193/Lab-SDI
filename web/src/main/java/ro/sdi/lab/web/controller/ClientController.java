@@ -3,11 +3,13 @@ package ro.sdi.lab.web.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -99,5 +101,22 @@ public class ClientController
     public List<ClientDto> filterClientsByName(@PathVariable String name)
     {
         return clientConverter.toDtos(clientService.filterClientsByName(name));
+    }
+
+    @RequestMapping(value = "/clients/{page}", method = GET)
+    public List<ClientDto> getClients(
+            @PathVariable int page,
+            @RequestParam(defaultValue = "id") String sort,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(defaultValue = "") String filter
+            )
+    {
+        Sort sortObject = Sort.by(sort);
+        if (order.equals("asc")) sortObject = sortObject.ascending();
+        if (order.equals("desc")) sortObject = sortObject.descending();
+
+        Iterable<Client> clients = clientService.getClients(filter, sortObject, page);
+        log.trace("Get clients page {} with filter {}, sort by {}, order {}: {}", page, filter, sort, order, clients);
+        return clientConverter.toDtos(clients);
     }
 }

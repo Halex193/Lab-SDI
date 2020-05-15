@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "movieId": 3,
-  "clientId": 2,
+  "clientId": 1,
   "time": "12-12-2012 12:12"
 }
 
@@ -12,3 +12,6 @@ GET http://localhost:8080/api/rentals
 
 ###
 DELETE http://localhost:8080/api/rentals/3-2
+
+###
+GET http://localhost:8080/api/rentals/0

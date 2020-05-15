@@ -2,8 +2,12 @@ package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -17,6 +21,7 @@ import ro.sdi.lab.core.validation.Validator;
 @Service
 public class ClientService
 {
+    public static final int PAGE_SIZE = 3;
     public static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
     Repository<Integer, Client> clientRepository;
@@ -129,5 +134,20 @@ public class ClientService
     public Optional<Client> findOne(int clientId)
     {
         return clientRepository.findOne(clientId);
+    }
+
+    public List<Client> getClients(String nameFilter, Sort sort, int page)
+    {
+        return clientRepository.findAll(
+                filterByName(nameFilter),
+                PageRequest.of(page, PAGE_SIZE, sort)
+        );
+    }
+
+    private static Specification<Client> filterByName(String nameFilter)
+    {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(root.<String>get(
+                        "name"), "%" + nameFilter + "%");
     }
 }

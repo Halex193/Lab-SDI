@@ -2,11 +2,15 @@ package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -21,7 +25,7 @@ import ro.sdi.lab.core.validation.Validator;
 public class RentalService
 {
     public static final Logger log = LoggerFactory.getLogger(RentalService.class);
-
+    public static final int PAGE_SIZE = 3;
     private final ClientService clientService;
     private final MovieService movieService;
     Repository<Rental.RentalID, Rental> rentalRepository;
@@ -185,4 +189,22 @@ public class RentalService
                                                           .isPresent())
                             .collect(Collectors.toUnmodifiableList());
     }
+
+    public List<Rental> getRentals(String dateFilter, Sort sort, int page)
+    {
+        return rentalRepository.findAll(
+                filterByDate(dateFilter),
+                PageRequest.of(page, PAGE_SIZE, sort)
+        );
+    }
+
+    private Specification<Rental> filterByDate(String dateFilter)
+    {
+        if (dateFilter.isEmpty()) return (root, query, criteriaBuilder) ->
+                criteriaBuilder.and();
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.<LocalDateTime>get(
+                        "time"), LocalDateTime.parse(dateFilter, formatter));
+    }
+
 }

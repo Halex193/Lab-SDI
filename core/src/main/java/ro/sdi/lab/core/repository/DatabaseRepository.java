@@ -1,5 +1,7 @@
 package ro.sdi.lab.core.repository;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
@@ -92,5 +94,10 @@ public class DatabaseRepository<ID extends Serializable, T extends Entity<ID>>
     public Iterable<T> findAll(Sort sort)
     {
         return SortingUtils.sort(getAll(), sort);
+    }
+
+    public List<T> findAll(Specification<T> specification, Pageable pageable)
+    {
+        return tableAdapter.findAll(specification, pageable).getContent();
     }
 }

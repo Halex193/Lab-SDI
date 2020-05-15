@@ -3,11 +3,13 @@ package ro.sdi.lab.web.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.format.DateTimeFormatter;
@@ -15,9 +17,11 @@ import java.util.List;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
+import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Rental;
 import ro.sdi.lab.core.service.RentalService;
 import ro.sdi.lab.web.converter.RentalConverter;
+import ro.sdi.lab.web.dto.MovieDto;
 import ro.sdi.lab.web.dto.RentalDto;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -119,5 +123,22 @@ public class RentalController
     public List<RentalDto> filterRentalsByMovieName(String name)
     {
         return rentalConverter.toDtos(rentalService.filterRentalsByMovieName(name));
+    }
+
+    @RequestMapping(value = "/rentals/{page}", method = GET)
+    public List<RentalDto> getRentals(
+            @PathVariable int page,
+            @RequestParam(defaultValue = "time") String sort,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(defaultValue = "") String filter
+    )
+    {
+        Sort sortObject = Sort.by(sort);
+        if (order.equals("asc")) sortObject = sortObject.ascending();
+        if (order.equals("desc")) sortObject = sortObject.descending();
+
+        Iterable<Rental> rentals = rentalService.getRentals(filter, sortObject, page);
+        log.trace("Get rentals page {} with filter {}, sort by {}, order {}: {}", page, filter, sort, order, rentals);
+        return rentalConverter.toDtos(rentals);
     }
 }

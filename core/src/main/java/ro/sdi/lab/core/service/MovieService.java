@@ -2,8 +2,11 @@ package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -11,6 +14,7 @@ import java.util.stream.StreamSupport;
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.exception.SortingException;
+import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Sort;
 import ro.sdi.lab.core.repository.Repository;
@@ -21,7 +25,7 @@ import ro.sdi.lab.core.validation.Validator;
 public class MovieService
 {
     public static final Logger log = LoggerFactory.getLogger(MovieService.class);
-
+    public static final int PAGE_SIZE = 3;
     Repository<Integer, Movie> movieRepository;
     Validator<Movie> movieValidator;
     EntityDeletedListener<Movie> entityDeletedListener = null;
@@ -154,5 +158,24 @@ public class MovieService
                                                                 .orElseThrow(() -> new SortingException(
                                                                         "repository doesn't support sorting"));
         return sortingRepo.findAll(criteria);
+    }
+
+    public List<Movie> getMovies(
+            String nameFilter,
+            org.springframework.data.domain.Sort sort,
+            int page
+    )
+    {
+        return movieRepository.findAll(
+                filterByName(nameFilter),
+                PageRequest.of(page, PAGE_SIZE, sort)
+        );
+    }
+
+    private static Specification<Movie> filterByName(String nameFilter)
+    {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.like(root.<String>get(
+                        "name"), "%" + nameFilter + "%");
     }
 }
