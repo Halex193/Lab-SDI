@@ -39,4 +39,9 @@ export abstract class Service<T extends Entity>
   abstract identify(baseURL, id: string): string
 
   abstract getId(item: T): string
+
+  getPaginatedItems(page: number, sort: string, order: string, filter: string): Observable<T[]>
+  {
+    return this.httpClient.get<T[]>(`${this.baseURL}/${page}?sort=${sort}&order=${order}&filter=${filter}`);
+  }
 }

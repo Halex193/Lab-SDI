@@ -8,6 +8,10 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
   errorMessage: string;
   items: Array<T>;
   formItem: T;
+  page: number = 0;
+  sort: string = "id";
+  order: string = "asc";
+  filter: string = "";
 
   protected constructor(protected service: Service<T>, protected router: Router, private entityName: string)
   {
@@ -20,7 +24,7 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
 
   getItems()
   {
-    this.service.getItems()
+    this.service.getPaginatedItems(this.page, this.sort, this.order, this.filter)
       .subscribe(
         items =>
         {
