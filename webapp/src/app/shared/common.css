@@ -18,3 +18,7 @@ ul li:hover {
 .error {
   color: red;
 }
+
+.validation-error {
+  color:red;
+}

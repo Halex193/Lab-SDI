@@ -13,6 +13,10 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
   order: string = "asc";
   filter: string = "";
 
+  sort2: string = "";
+  order2: string = "asc";
+  filter2: string = "";
+
   protected constructor(protected service: Service<T>, protected router: Router, private entityName: string)
   {
   }
@@ -28,7 +32,7 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
       .subscribe(
         items =>
         {
-          this.items = items;
+          this.items = this.filterAndSortItems(items);
           console.log("Received items: ", items)
         },
         () => this.errorMessage = "Items not available"
@@ -65,4 +69,6 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
   abstract getId(item: T): string
 
   abstract copyItem(item: T)
+
+  abstract filterAndSortItems(items: T[])
 }
