@@ -23,10 +23,10 @@ export class ClientsComponent extends ItemComponent<Client>
     return client.id.toString()
   }
 
-  copyItem(client: Client)
+  copyItem(item: Client)
   {
-    this.formItem.id = client.id
-    this.formItem.name = client.name
+    this.formItem.id = item.id
+    this.formItem.name = item.name
   }
 
   filterAndSortItems(clients: Client[]): Client[]

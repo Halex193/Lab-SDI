@@ -8,13 +8,18 @@ import { ClientsComponent } from './clients/clients.component';
 import { MoviesComponent } from './movies/movies.component';
 import { RentalsComponent } from './rentals/rentals.component';
 import {ClientService} from "./clients/client.service";
+import { ReportsComponent } from './reports/reports.component';
+import {MovieService} from "./movies/movie.service";
+import {RentalService} from "./rentals/rental.service";
+import {ReportService} from "./reports/report.service";
 
 @NgModule({
   declarations: [
     AppComponent,
     ClientsComponent,
     MoviesComponent,
-    RentalsComponent
+    RentalsComponent,
+    ReportsComponent
   ],
   imports: [
     BrowserModule,
@@ -22,7 +27,7 @@ import {ClientService} from "./clients/client.service";
     HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [ClientService],
+  providers: [ClientService, MovieService, RentalService, ReportService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

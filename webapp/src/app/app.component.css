@@ -1,0 +1,16 @@
+a {
+  margin:10px;
+  padding:10px;
+  background-color: deepskyblue;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  color:white;
+}
+a:hover {
+  background-color: lightseagreen;
+}
+
+a:active {
+  color:white;
+}

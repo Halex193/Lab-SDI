@@ -1,1 +1,113 @@
-<p>rentals works!</p>
+<h2>Rentals</h2>
+<div class="error">{{errorMessage}}</div>
+<div class="server-side">
+  <span>Server-side: </span>
+  <label>Page:
+    <input type="number" [(ngModel)]="page" (change)="getItems()" min="0">
+  </label>
+  <label>Sort:
+    <select [(ngModel)]="sort" (change)="getItems()">
+      <option value="movieId">Movie Id</option>
+      <option value="clientId">Client Id</option>
+      <option value="time">Time</option>
+    </select>
+  </label>
+  <label>Order:
+    <select [(ngModel)]="order" (change)="getItems()">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+  </label>
+  <label>Filter:
+    <input type="text" [(ngModel)]="filter" (keyup)="getItems()">
+  </label>
+  <br/>
+</div>
+<div class="client-side">
+  <span>Client-side: </span>
+  <label>Sort:
+    <select [(ngModel)]="sort2" (change)="getItems()">
+      <option value=""></option>
+      <option value="movieId">Movie Id</option>
+      <option value="clientId">Client Id</option>
+      <option value="time">Time</option>
+    </select>
+  </label>
+  <label>Order:
+    <select [(ngModel)]="order2" (change)="getItems()">
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+  </label>
+  <label>Filter:
+    <input type="text" [(ngModel)]="filter2" (keyup)="getItems()">
+  </label>
+</div>
+<ul>
+  <li *ngFor="let rental of items"
+      (click)="onSelect(rental)">
+    Movie Id:{{rental.movieId}} | Client Id:{{rental.clientId}} | Time:{{rental.time}}
+    <button
+      [class.delete]="true"
+      (click)="delete(rental);$event.stopPropagation()">X
+    </button>
+  </li>
+
+</ul>
+<button
+  (click)="update();$event.stopPropagation()">Update
+</button>
+<button
+  (click)="add();$event.stopPropagation()">Add
+</button>
+<div *ngIf="formItem">
+
+  <div>
+    <label>Movie Id:
+      <input type="number" [(ngModel)]="formItem.movieId" placeholder="Movie Id" required min="0"
+             #movieId="ngModel">
+    </label>
+  </div>
+
+  <div *ngIf="clientId.invalid && (clientId.dirty || clientId.touched)" class="validation-error">
+
+    <div *ngIf="clientId.errors.required">
+      Movie Id is required.
+    </div>
+    <div *ngIf="clientId.errors.min">
+      Movie Id must be minimum 0
+    </div>
+  </div>
+
+  <div>
+    <label>Client Id:
+      <input type="number" [(ngModel)]="formItem.clientId" placeholder="Client Id" required min="0"
+             #clientId="ngModel">
+    </label>
+  </div>
+
+  <div *ngIf="clientId.invalid && (clientId.dirty || clientId.touched)" class="validation-error">
+
+    <div *ngIf="clientId.errors.required">
+      Client Id is required.
+    </div>
+    <div *ngIf="clientId.errors.min">
+      Client Id must be minimum 0
+    </div>
+  </div>
+
+
+  <div>
+    <label>Time:
+      <input [(ngModel)]="formItem.time" placeholder="Time" required
+             #time="ngModel"/>
+    </label>
+  </div>
+
+  <div *ngIf="time.invalid && (time.dirty || time.touched)" class="validation-error">
+
+    <div *ngIf="time.errors.required">
+      Name is required.
+    </div>
+  </div>
+</div>
