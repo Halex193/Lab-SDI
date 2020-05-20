@@ -128,6 +128,7 @@ public class RentalController
     @RequestMapping(value = "/rentals/{page}", method = GET)
     public List<RentalDto> getRentals(
             @PathVariable int page,
+            @RequestParam(defaultValue = "3") int pageSize,
             @RequestParam(defaultValue = "time") String sort,
             @RequestParam(defaultValue = "asc") String order,
             @RequestParam(defaultValue = "") String filter
@@ -137,7 +138,7 @@ public class RentalController
         if (order.equals("asc")) sortObject = sortObject.ascending();
         if (order.equals("desc")) sortObject = sortObject.descending();
 
-        Iterable<Rental> rentals = rentalService.getRentals(filter, sortObject, page);
+        Iterable<Rental> rentals = rentalService.getRentals(filter, sortObject, page, pageSize);
         log.trace("Get rentals page {} with filter {}, sort by {}, order {}: {}", page, filter, sort, order, rentals);
         return rentalConverter.toDtos(rentals);
     }

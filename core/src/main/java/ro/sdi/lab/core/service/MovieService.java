@@ -163,12 +163,13 @@ public class MovieService
     public List<Movie> getMovies(
             String nameFilter,
             org.springframework.data.domain.Sort sort,
-            int page
+            int page,
+            int pageSize
     )
     {
         return movieRepository.findAll(
                 filterByName(nameFilter),
-                PageRequest.of(page, PAGE_SIZE, sort)
+                PageRequest.of(page, pageSize, sort)
         );
     }
 

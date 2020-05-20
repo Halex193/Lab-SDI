@@ -5,6 +5,9 @@
   <label>Page:
     <input type="number" [(ngModel)]="page" (change)="getItems()" min="0">
   </label>
+  <label>Page size:
+    <input type="number" [(ngModel)]="pageSize" (change)="getItems()" min="0">
+  </label>
   <label>Sort:
     <select [(ngModel)]="sort" (change)="getItems()">
       <option value="id">Id</option>

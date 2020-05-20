@@ -136,11 +136,11 @@ public class ClientService
         return clientRepository.findOne(clientId);
     }
 
-    public List<Client> getClients(String nameFilter, Sort sort, int page)
+    public List<Client> getClients(String nameFilter, Sort sort, int page, int pageSize)
     {
         return clientRepository.findAll(
                 filterByName(nameFilter),
-                PageRequest.of(page, PAGE_SIZE, sort)
+                PageRequest.of(page, pageSize, sort)
         );
     }
 

@@ -190,11 +190,11 @@ public class RentalService
                             .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Rental> getRentals(String dateFilter, Sort sort, int page)
+    public List<Rental> getRentals(String dateFilter, Sort sort, int page, int pageSize)
     {
         return rentalRepository.findAll(
                 filterByDate(dateFilter),
-                PageRequest.of(page, PAGE_SIZE, sort)
+                PageRequest.of(page, pageSize, sort)
         );
     }
 
