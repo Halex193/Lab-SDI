@@ -8,12 +8,35 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+                name = "movieRentals",
+                attributeNodes = @NamedAttributeNode(value = "movieRentals")
+        ),
+
+
+        @NamedEntityGraph(
+                name = "movieRentalsWithClients",
+                attributeNodes = @NamedAttributeNode(
+                        value = "movieRentals",
+                        subgraph = "rentalClient"
+                ),
+                subgraphs = @NamedSubgraph(
+                        name = "rentalClient",
+                        attributeNodes = @NamedAttributeNode(value = "client")
+                )
+        )
+})
 @javax.persistence.Entity
 public class Movie extends Entity<Integer> implements Serializable
 {

@@ -8,10 +8,34 @@ import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+                name = "clientRentals",
+                attributeNodes = @NamedAttributeNode(value = "clientRentals")
+        ),
+
+
+        @NamedEntityGraph(
+                name = "clientRentalsWithMovies",
+                attributeNodes = @NamedAttributeNode(
+                        value = "clientRentals",
+                        subgraph = "rentalMovie"
+                ),
+                subgraphs = @NamedSubgraph(
+                        name = "rentalMovie",
+                        attributeNodes = @NamedAttributeNode(value = "movie")
+                )
+        )
+})
 @javax.persistence.Entity
 public class Client extends Entity<Integer> implements Serializable
 {
