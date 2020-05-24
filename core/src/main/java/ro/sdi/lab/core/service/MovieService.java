@@ -2,33 +2,25 @@ package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
-import ro.sdi.lab.core.exception.SortingException;
-import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.model.Movie;
-import ro.sdi.lab.core.model.Sort;
 import ro.sdi.lab.core.repository.Repository;
-import ro.sdi.lab.core.repository.SortingRepository;
 import ro.sdi.lab.core.validation.Validator;
 
 @Service
 public class MovieService
 {
     public static final Logger log = LoggerFactory.getLogger(MovieService.class);
-    public static final int PAGE_SIZE = 3;
     Repository<Integer, Movie> movieRepository;
     Validator<Movie> movieValidator;
-    EntityDeletedListener<Movie> entityDeletedListener = null;
 
     public MovieService(
             Repository<Integer, Movie> movieRepository,
@@ -37,11 +29,6 @@ public class MovieService
     {
         this.movieRepository = movieRepository;
         this.movieValidator = movieValidator;
-    }
-
-    public void setEntityDeletedListener(EntityDeletedListener<Movie> entityDeletedListener)
-    {
-        this.entityDeletedListener = entityDeletedListener;
     }
 
     /**
@@ -56,13 +43,16 @@ public class MovieService
         Movie movie = new Movie(id, name, genre, rating);
         movieValidator.validate(movie);
         log.trace("Adding movie {}", movie);
-        movieRepository.save(movie).ifPresent(opt ->
-                                              {
-                                                  throw new AlreadyExistingElementException(String.format(
-                                                          "Movie %d already exists",
-                                                          id
-                                                  ));
-                                              });
+
+        movieRepository.findById(id).ifPresent(
+                (item) ->
+                {
+                    throw new AlreadyExistingElementException(String.format(
+                            "Movie %d already exists",
+                            id
+                    ));
+                });
+        movieRepository.save(movie);
     }
 
     /**
@@ -74,20 +64,14 @@ public class MovieService
     public void deleteMovie(int id)
     {
         log.trace("Removing movie with id {}", id);
-        movieRepository
-                .delete(id)
-                .ifPresentOrElse(
-                        entity -> Optional
-                                .ofNullable(entityDeletedListener)
-                                .ifPresent(listener -> listener.onEntityDeleted(entity)),
-                        () ->
-                        {
-                            throw new ElementNotFoundException(String.format(
-                                    "Movie %d does not exist",
-                                    id
-                            ));
-                        }
-                );
+        if (movieRepository.findById(id).isEmpty())
+        {
+            throw new ElementNotFoundException(String.format(
+                    "Movie %d does not exist",
+                    id
+            ));
+        }
+        movieRepository.deleteById(id);
     }
 
     /**
@@ -95,7 +79,7 @@ public class MovieService
      *
      * @return all: an iterable collection of movies
      */
-    public Iterable<Movie> getMovies()
+    public List<Movie> getMovies()
     {
         log.trace("Retrieving all movies");
         return movieRepository.findAll();
@@ -110,6 +94,7 @@ public class MovieService
      * @param rating : the rating of the movie
      * @throws ElementNotFoundException if the movie isn't found in the repository based on their ID
      */
+    @Transactional
     public void updateMovie(
             int id,
             String name,
@@ -117,66 +102,35 @@ public class MovieService
             Integer rating
     )
     {
-        Movie storedMovie = movieRepository.findOne(id)
-                                           .orElseThrow(() -> new ElementNotFoundException(String.format(
-                                                   "Movie %d does not exist",
-                                                   id
-                                           )));
-        Movie movie = new Movie(id, Optional.ofNullable(name).orElseGet(storedMovie::getName),
-                                Optional.ofNullable(genre).orElseGet(storedMovie::getGenre),
-                                Optional.ofNullable(rating).orElseGet(storedMovie::getRating)
-        );
+        Movie movie = new Movie(id, name, genre, rating);
         movieValidator.validate(movie);
         log.trace("Updating movie {}", movie);
-        movieRepository.update(movie)
-                       .orElseThrow(() -> new ElementNotFoundException(String.format(
-                               "Movie %d does not exist",
-                               id
-                       )));
+
+        Movie oldMovie = movieRepository
+                .findById(id)
+                .orElseThrow(() -> new ElementNotFoundException(
+                        String.format(
+                                "Movie %d does not exist",
+                                id
+                        )));
+        oldMovie.setId(movie.getId());
+        oldMovie.setName(movie.getName());
+        oldMovie.setGenre(movie.getGenre());
+        oldMovie.setRating(movie.getRating());
+        movieRepository.save(oldMovie);
     }
 
     public Iterable<Movie> filterMoviesByGenre(String genre)
     {
         log.trace("Filtering movies by the genre {}", genre);
         String regex = ".*" + genre + ".*";
-        return StreamSupport.stream(movieRepository.findAll().spliterator(), false)
+        return movieRepository.findAll().stream()
                             .filter(movie -> movie.getGenre().matches(regex))
                             .collect(Collectors.toUnmodifiableList());
     }
 
     public Optional<Movie> findOne(int movieId)
     {
-        return movieRepository.findOne(movieId);
-    }
-
-    public Iterable<Movie> sortMovies(Sort criteria)
-    {
-        log.trace("Sorting movies");
-        SortingRepository<Integer, Movie> sortingRepo = Optional.of(movieRepository)
-                                                                .filter(repo -> repo instanceof SortingRepository)
-                                                                .map(repo -> (SortingRepository<Integer, Movie>) repo)
-                                                                .orElseThrow(() -> new SortingException(
-                                                                        "repository doesn't support sorting"));
-        return sortingRepo.findAll(criteria);
-    }
-
-    public List<Movie> getMovies(
-            String nameFilter,
-            org.springframework.data.domain.Sort sort,
-            int page,
-            int pageSize
-    )
-    {
-        return movieRepository.findAll(
-                filterByName(nameFilter),
-                PageRequest.of(page, pageSize, sort)
-        );
-    }
-
-    private static Specification<Movie> filterByName(String nameFilter)
-    {
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(root.<String>get(
-                        "name"), "%" + nameFilter + "%");
+        return movieRepository.findById(movieId);
     }
 }

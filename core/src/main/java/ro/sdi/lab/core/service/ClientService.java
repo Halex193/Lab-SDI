@@ -2,15 +2,12 @@ package ro.sdi.lab.core.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
@@ -21,12 +18,10 @@ import ro.sdi.lab.core.validation.Validator;
 @Service
 public class ClientService
 {
-    public static final int PAGE_SIZE = 3;
     public static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
     Repository<Integer, Client> clientRepository;
     Validator<Client> clientValidator;
-    EntityDeletedListener<Client> entityDeletedListener = null;
 
     public ClientService(
             Repository<Integer, Client> clientRepository,
@@ -35,11 +30,6 @@ public class ClientService
     {
         this.clientRepository = clientRepository;
         this.clientValidator = clientValidator;
-    }
-
-    public void setEntityDeletedListener(EntityDeletedListener<Client> entityDeletedListener)
-    {
-        this.entityDeletedListener = entityDeletedListener;
     }
 
     /**
@@ -54,15 +44,16 @@ public class ClientService
         Client client = new Client(id, name);
         clientValidator.validate(client);
         log.trace("Adding client {}", client);
-        clientRepository
-                .save(client)
-                .ifPresent(opt ->
-                           {
-                               throw new AlreadyExistingElementException(String.format(
-                                       "Client %d already exists",
-                                       id
-                               ));
-                           });
+
+        clientRepository.findById(id).ifPresent(
+                (item) ->
+                {
+                    throw new AlreadyExistingElementException(String.format(
+                            "Client %d already exists",
+                            id
+                    ));
+                });
+        clientRepository.save(client);
     }
 
     /**
@@ -74,20 +65,14 @@ public class ClientService
     public void deleteClient(int id)
     {
         log.trace("Removing client with id {}", id);
-        clientRepository
-                .delete(id)
-                .ifPresentOrElse(
-                        entity -> Optional
-                                .ofNullable(entityDeletedListener)
-                                .ifPresent(listener -> listener.onEntityDeleted(entity)),
-                        () ->
-                        {
-                            throw new ElementNotFoundException(String.format(
-                                    "Client %d does not exist",
-                                    id
-                            ));
-                        }
-                );
+        if (clientRepository.findById(id).isEmpty())
+        {
+            throw new ElementNotFoundException(String.format(
+                    "Client %d does not exist",
+                    id
+            ));
+        }
+        clientRepository.deleteById(id);
     }
 
     /**
@@ -95,7 +80,7 @@ public class ClientService
      *
      * @return all: an iterable collection of clients
      */
-    public Iterable<Client> getClients()
+    public List<Client> getClients()
     {
         log.trace("Retrieving all clients");
         return clientRepository.findAll();
@@ -108,46 +93,36 @@ public class ClientService
      * @param name: the new name of the client
      * @throws ElementNotFoundException if the client isn't found in the repository based on their ID
      */
+    @Transactional
     public void updateClient(int id, String name)
     {
         Client client = new Client(id, name);
         clientValidator.validate(client);
         log.trace("Updating client {}", client);
-        clientRepository
-                .update(client)
-                .orElseThrow(() -> new ElementNotFoundException(String.format(
-                        "Client %d does not exist",
-                        id
-                )));
+
+        Client oldClient = clientRepository
+                .findById(id)
+                .orElseThrow(() -> new ElementNotFoundException(
+                        String.format(
+                                "Client %d does not exist",
+                                id
+                        )));
+        oldClient.setId(client.getId());
+        oldClient.setName(client.getName());
+        clientRepository.save(oldClient);
     }
 
     public Iterable<Client> filterClientsByName(String name)
     {
         log.trace("Filtering clients by the name {}", name);
         String regex = ".*" + name + ".*";
-        return StreamSupport
-                .stream(clientRepository.findAll().spliterator(), false)
+        return clientRepository.findAll().stream()
                 .filter(client -> client.getName().matches(regex))
                 .collect(Collectors.toUnmodifiableList());
     }
 
     public Optional<Client> findOne(int clientId)
     {
-        return clientRepository.findOne(clientId);
-    }
-
-    public List<Client> getClients(String nameFilter, Sort sort, int page, int pageSize)
-    {
-        return clientRepository.findAll(
-                filterByName(nameFilter),
-                PageRequest.of(page, pageSize, sort)
-        );
-    }
-
-    private static Specification<Client> filterByName(String nameFilter)
-    {
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.like(root.<String>get(
-                        "name"), "%" + nameFilter + "%");
+        return clientRepository.findById(clientId);
     }
 }

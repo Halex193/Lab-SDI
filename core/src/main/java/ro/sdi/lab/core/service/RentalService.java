@@ -6,61 +6,36 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.DateTimeInvalidException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
+import ro.sdi.lab.core.model.Client;
+import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Rental;
-import ro.sdi.lab.core.repository.Repository;
-import ro.sdi.lab.core.validation.Validator;
 
 @Service
 public class RentalService
 {
     public static final Logger log = LoggerFactory.getLogger(RentalService.class);
-    public static final int PAGE_SIZE = 3;
     private final ClientService clientService;
     private final MovieService movieService;
-    Repository<Rental.RentalID, Rental> rentalRepository;
-    Validator<Rental> rentalValidator;
+
     public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
-    public RentalService(
-            ClientService clientService,
-            MovieService movieService,
-            Repository<Rental.RentalID, Rental> rentalRepository,
-            Validator<Rental> rentalValidator
-    )
+    public RentalService(ClientService clientService, MovieService movieService)
     {
         this.clientService = clientService;
         this.movieService = movieService;
-        this.rentalRepository = rentalRepository;
-        this.rentalValidator = rentalValidator;
-        setupCascadeDeletion();
-    }
-
-    private void setupCascadeDeletion()
-    {
-        clientService.setEntityDeletedListener(
-                client -> StreamSupport
-                        .stream(rentalRepository.findAll().spliterator(), false)
-                        .filter(rental -> rental.getId().getClientId() == client.getId())
-                        .forEach(rental -> rentalRepository.delete(rental.getId()))
-        );
-
-        movieService.setEntityDeletedListener(
-                movie -> StreamSupport
-                        .stream(rentalRepository.findAll().spliterator(), false)
-                        .filter(rental -> rental.getId().getMovieId() == movie.getId())
-                        .forEach(rental -> rentalRepository.delete(rental.getId()))
-        );
     }
 
     /**
@@ -73,48 +48,40 @@ public class RentalService
      * @throws AlreadyExistingElementException if the rental already exists in the repository
      * @throws DateTimeInvalidException        if the date and time cannot be parsed
      */
+    @Transactional
     public void addRental(int movieId, int clientId, String time)
     {
-        checkRentalID(movieId, clientId);
+        Movie movie = movieService
+                .findOne(movieId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Movie %d does not exist",
+                        movieId
+                )));
+        Client client = clientService
+                .findOne(clientId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Client %d does not exist",
+                        clientId
+                )));
+
         Rental rental;
+        LocalDateTime dateTime;
         try
         {
-            LocalDateTime dateTime;
             if (time.equals("now"))
                 dateTime = LocalDateTime.now();
             else
                 dateTime = LocalDateTime.parse(time, formatter);
-            rental = new Rental(movieId, clientId, dateTime);
+            rental = new Rental(movie, client, dateTime);
         }
         catch (DateTimeParseException e)
         {
             throw new DateTimeInvalidException("Date and time invalid");
         }
-        rentalValidator.validate(rental);
         log.trace("Adding rental {}", rental);
-        rentalRepository.save(rental)
-                        .ifPresent(opt ->
-                                   {
-                                       throw new AlreadyExistingElementException(String.format(
-                                               "Rental of movie %d and client %d already exists",
-                                               movieId,
-                                               clientId
-                                       ));
-                                   });
-    }
 
-    private void checkRentalID(int movieId, int clientId)
-    {
-        movieService.findOne(movieId)
-                    .orElseThrow(() -> new ElementNotFoundException(String.format(
-                            "Movie %d does not exist",
-                            movieId
-                    )));
-        clientService.findOne(clientId)
-                     .orElseThrow(() -> new ElementNotFoundException(String.format(
-                             "Client %d does not exist",
-                             clientId
-                     )));
+        client.rentMovie(movie, dateTime);
+        clientService.clientRepository.save(client);
     }
 
     /**
@@ -124,16 +91,33 @@ public class RentalService
      * @param clientId: the ID of the client
      * @throws ElementNotFoundException if the movie, client don't exist of if the rental itself doesn't exist in the repository
      */
+    @Transactional
     public void deleteRental(int movieId, int clientId)
     {
         log.trace("Removing rental with id {} {}", movieId, clientId);
-        checkRentalID(movieId, clientId);
-        rentalRepository.delete(new Rental.RentalID(movieId, clientId))
-                        .orElseThrow(() -> new ElementNotFoundException(String.format(
-                                "Rental of movie %d and client %d does not exist",
-                                movieId,
-                                clientId
-                        )));
+
+        Movie movie = movieService
+                .findOne(movieId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Movie %d does not exist",
+                        movieId
+                )));
+        Client client = clientService
+                .findOne(clientId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Client %d does not exist",
+                        clientId
+                )));
+        if (!client.getMovies().stream().anyMatch((m) -> m == movie))
+        {
+            throw new ElementNotFoundException(String.format(
+                    "Rental of movie %d and client %d does not exist",
+                    movieId,
+                    clientId
+            ));
+        }
+        client.deleteMovie(movie);
+        clientService.clientRepository.save(client);
     }
 
     /**
@@ -141,10 +125,10 @@ public class RentalService
      *
      * @return all: an iterable collection of rentals
      */
-    public Iterable<Rental> getRentals()
+    public List<Rental> getRentals()
     {
         log.trace("Retrieving all rentals");
-        return rentalRepository.findAll();
+        return clientService.clientRepository.getAllRentals();
     }
 
     /**

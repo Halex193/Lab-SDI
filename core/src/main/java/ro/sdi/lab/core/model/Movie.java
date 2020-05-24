@@ -1,7 +1,14 @@
 package ro.sdi.lab.core.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -67,5 +74,20 @@ public class Movie extends Entity<Integer> implements Serializable
     public String toString()
     {
         return String.format("Movie[%d, %s, %s, %d]", id, name, genre, rating);
+    }
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Rental> movieRentals = new HashSet<>();
+
+    public Set<Client> getClients()
+    {
+        return movieRentals.stream()
+                            .map(Rental::getClient)
+                            .collect(Collectors.toUnmodifiableSet());
+    }
+
+    public void rentMovie(Client client, LocalDateTime time)
+    {
+        movieRentals.add(new Rental(this, client, time));
     }
 }

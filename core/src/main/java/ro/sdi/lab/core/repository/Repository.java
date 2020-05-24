@@ -1,73 +1,13 @@
 package ro.sdi.lab.core.repository;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Optional;
 
-import ro.sdi.lab.core.exception.ValidatorException;
 import ro.sdi.lab.core.model.Entity;
 
-/**
- * Interface for generic CRUD operations on a repository for a specific type.
- *
- * @author radu.
- */
 public interface Repository<ID extends Serializable, T extends Entity<ID>>
+        extends JpaRepository<T, ID>, JpaSpecificationExecutor<T>
 {
-    /**
-     * Find the entity with the given {@code id}.
-     *
-     * @param id must be not null.
-     * @return an {@code Optional} encapsulating the entity with the given id.
-     * @throws IllegalArgumentException if the given id is null.
-     */
-    Optional<T> findOne(ID id);
-
-    /**
-     *
-     * @return all entities.
-     */
-    Iterable<T> findAll();
-
-    /**
-     * Saves the given entity.
-     *
-     * @param entity
-     *            must not be null.
-     * @return an {@code Optional} - null if the entity was saved, otherwise (e.g. id already exists) returns the entity.
-     * @throws IllegalArgumentException
-     *             if the given entity is null.
-     * @throws ValidatorException
-     *             if the entity is not valid.
-     */
-    Optional<T> save(T entity) throws ValidatorException;
-
-    /**
-     * Removes the entity with the given id.
-     *
-     * @param id
-     *            must not be null.
-     * @return an {@code Optional} - null if there is no entity with the given id, otherwise the removed entity.
-     * @throws IllegalArgumentException
-     *             if the given id is null.
-     */
-    Optional<T> delete(ID id);
-
-    /**
-     * Updates the given entity.
-     * 
-     * @param entity
-     *            must not be null.
-     * @return an {@code Optional} - the new entity if it was updated, otherwise (e.g. id does not exist) returns null.
-     * @throws IllegalArgumentException
-     *             if the given entity is null.
-     * @throws ValidatorException
-     *             if the entity is not valid.
-     */
-    Optional<T> update(T entity) throws ValidatorException;
-
-    List<T> findAll(Specification<T> specification, Pageable pageable);
 }
