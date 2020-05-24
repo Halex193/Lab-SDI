@@ -99,7 +99,7 @@ public class Movie extends Entity<Integer> implements Serializable
         return String.format("Movie[%d, %s, %s, %d]", id, name, genre, rating);
     }
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Rental> movieRentals = new HashSet<>();
 
     public Set<Client> getClients()

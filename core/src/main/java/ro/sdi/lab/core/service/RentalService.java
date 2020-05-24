@@ -80,7 +80,10 @@ public class RentalService
             throw new DateTimeInvalidException("Date and time invalid");
         }
         log.trace("Adding rental {}", rental);
-
+        if(client.getMovies().stream().anyMatch(m -> m.getId().equals(movie.getId())))
+        {
+            throw new AlreadyExistingElementException("Rental already exists");
+        }
         client.rentMovie(movie, dateTime);
         clientRepository.save(client);
     }
@@ -109,7 +112,7 @@ public class RentalService
                         "Client %d does not exist",
                         clientId
                 )));
-        if (client.getMovies().stream().noneMatch((m) -> m == movie))
+        if (client.getMovies().stream().noneMatch(m -> m.getId().equals(movie.getId())))
         {
             throw new ElementNotFoundException(String.format(
                     "Rental of movie %d and client %d does not exist",

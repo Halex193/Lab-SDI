@@ -25,6 +25,11 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import ro.sdi.lab.core.repository.custom.CustomRepository;
+import ro.sdi.lab.core.repository.custom.CustomRepositoryNative;
+import ro.sdi.lab.core.repository.custom.CustomRepositoryJPQL;
+import ro.sdi.lab.core.repository.custom.CustomRepositoryCriteria;
+
 @Configuration
 @EnableJpaRepositories({"ro.sdi.lab.core.repository"})
 @EnableTransactionManagement
@@ -43,6 +48,9 @@ public class JPAConfig
 
     @Value("${db.generateDDL}")
     private Boolean generateDDL;
+
+    @Value("${db.configuration}")
+    private String configuration;
 
     /**
      * http://www.baeldung.com/hikaricp
@@ -112,4 +120,18 @@ public class JPAConfig
         return factory.getValidator();
     }
 
+    @Bean
+    CustomRepository customRepository()
+    {
+        switch(configuration)
+        {
+            case "JPQL":
+            return new CustomRepositoryJPQL();
+            case "Criteria":
+                return new CustomRepositoryCriteria();
+            case "Native":
+                return new CustomRepositoryNative();
+        }
+        throw new RuntimeException("Repository configuration invalid!");
+    }
 }

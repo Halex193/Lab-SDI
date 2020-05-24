@@ -70,8 +70,13 @@ public class Client extends Entity<Integer> implements Serializable
         return String.format("Client[%d, %s]", id, name);
     }
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Rental> clientRentals = new HashSet<>();
+
+    public void deleteMovie(Movie movie)
+    {
+        clientRentals.removeIf(rental -> rental.getMovie().id.equals(movie.id));
+    }
 
     public Set<Movie> getMovies()
     {
@@ -85,18 +90,10 @@ public class Client extends Entity<Integer> implements Serializable
         clientRentals.add(new Rental(movie, this, time));
     }
 
-    public void deleteMovie(Movie movie)
-    {
-        clientRentals = clientRentals
-                .stream()
-                .filter(rental -> rental.getMovie() != movie)
-                .collect(Collectors.toSet());
-    }
-
     public void updateRentalTime(Movie movie, LocalDateTime dateTime)
     {
         clientRentals.stream()
-                     .filter(rental -> rental.getMovie() == movie)
+                     .filter(rental -> rental.getMovie().id.equals(movie.id))
                      .forEach(rental -> rental.setTime(dateTime));
     }
 }

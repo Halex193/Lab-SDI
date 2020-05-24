@@ -54,21 +54,20 @@ public class RentalController
     @RequestMapping(value = "/rentals", method = POST)
     public ResponseEntity<?> addRental(@RequestBody RentalDto rentalDto)
     {
-        Rental rental = rentalConverter.toModel(rentalDto);
         try
         {
             rentalService.addRental(
-                    rental.getMovie().getId(),
-                    rental.getClient().getId(),
-                    formatter.format(rental.getTime())
+                    rentalDto.getMovieId(),
+                    rentalDto.getClientId(),
+                    rentalDto.getTime()
             );
         }
         catch (AlreadyExistingElementException e)
         {
-            log.trace("Rental {} already exists", rental);
+            log.trace("Rental {}-{} already exists", rentalDto.getMovieId(), rentalDto.getClientId());
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        log.trace("Rental {} added", rental);
+        log.trace("Rental {}-{} added", rentalDto.getMovieId(), rentalDto.getClientId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
