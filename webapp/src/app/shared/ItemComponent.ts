@@ -8,11 +8,6 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
   errorMessage: string;
   items: Array<T>;
   formItem: T;
-  page: number = 0;
-  pageSize: number = 3;
-  sort: string = "id";
-  order: string = "asc";
-  filter: string = "";
 
   sort2: string = "";
   order2: string = "asc";
@@ -29,7 +24,7 @@ export abstract class ItemComponent<T extends Entity> implements OnInit
 
   getItems()
   {
-    this.service.getPaginatedItems(this.page, this.pageSize, this.sort, this.order, this.filter)
+    this.service.getItems()
       .subscribe(
         items =>
         {

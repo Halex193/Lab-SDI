@@ -1,32 +1,5 @@
 <h2>Movies</h2>
 <div class="error">{{errorMessage}}</div>
-<div class="server-side">
-  <span>Server-side: </span>
-  <label>Page:
-    <input type="number" [(ngModel)]="page" (change)="getItems()" min="0">
-  </label>
-  <label>Page size:
-    <input type="number" [(ngModel)]="pageSize" (change)="getItems()" min="0">
-  </label>
-  <label>Sort:
-    <select [(ngModel)]="sort" (change)="getItems()">
-      <option value="id">Id</option>
-      <option value="name">Name</option>
-      <option value="genre">Genre</option>
-      <option value="rating">Rating</option>
-    </select>
-  </label>
-  <label>Order:
-    <select [(ngModel)]="order" (change)="getItems()">
-      <option value="asc">Ascending</option>
-      <option value="desc">Descending</option>
-    </select>
-  </label>
-  <label>Filter:
-    <input type="text" [(ngModel)]="filter" (keyup)="getItems()">
-  </label>
-  <br/>
-</div>
 <div class="client-side">
   <span>Client-side: </span>
   <label>Sort:
