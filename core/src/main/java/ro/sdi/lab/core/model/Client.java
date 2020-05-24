@@ -68,4 +68,11 @@ public class Client extends Entity<Integer> implements Serializable
                 .filter(rental -> rental.getMovie() != movie)
                 .collect(Collectors.toSet());
     }
+
+    public void updateRentalTime(Movie movie, LocalDateTime dateTime)
+    {
+        clientRentals.stream()
+                     .filter(rental -> rental.getMovie() == movie)
+                     .forEach(rental -> rental.setTime(dateTime));
+    }
 }

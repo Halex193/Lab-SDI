@@ -4,12 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.List;
 
 import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Rental;
 import ro.sdi.lab.core.model.dto.ClientGenre;
 import ro.sdi.lab.core.model.dto.RentedMovieStatistic;
+import ro.sdi.lab.core.repository.ClientRepository;
+import ro.sdi.lab.core.repository.MovieRepository;
 import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
@@ -18,38 +21,29 @@ public class Service
 {
     public static final Logger log = LoggerFactory.getLogger(Service.class);
 
-    Repository<Integer, Client> clientRepository;
-    Repository<Integer, Movie> movieRepository;
-    Validator<Client> clientValidator;
-    Validator<Movie> movieValidator;
-    Validator<Rental> rentalValidator;
+    private final ClientRepository clientRepository;
+    private final MovieRepository movieRepository;
 
     public Service(
-            Repository<Integer, Client> clientRepository,
-            Repository<Integer, Movie> movieRepository,
-            Validator<Client> clientValidator,
-            Validator<Movie> movieValidator,
-            Validator<Rental> rentalValidator
+            ClientRepository clientRepository,
+            MovieRepository movieRepository
     )
     {
         this.clientRepository = clientRepository;
         this.movieRepository = movieRepository;
-        this.clientValidator = clientValidator;
-        this.movieValidator = movieValidator;
-        this.rentalValidator = rentalValidator;
     }
 
-    public Iterable<RentedMovieStatistic> getTop10RentedMovies()
+    public List<RentedMovieStatistic> getTop10RentedMovies()
     {
-        return Collections.emptyList();
+        return movieRepository.getTop10RentedMovies();
     }
 
     /**
      * Retrieves the most rented genre for each client, or the empty string if the client did not rent any movies
      */
-    public Iterable<ClientGenre> getClientGenres()
+    public List<ClientGenre> getClientGenres()
     {
-        return Collections.emptyList();
+        return clientRepository.getClientGenres();
     }
 
 }

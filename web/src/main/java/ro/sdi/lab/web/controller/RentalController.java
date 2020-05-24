@@ -116,28 +116,4 @@ public class RentalController
         );
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-    @RequestMapping(value = "/rentals/filter/{name}", method = GET)
-    public List<RentalDto> filterRentalsByMovieName(String name)
-    {
-        return rentalConverter.toDtos(rentalService.filterRentalsByMovieName(name));
-    }
-
-    @RequestMapping(value = "/rentals/{page}", method = GET)
-    public List<RentalDto> getRentals(
-            @PathVariable int page,
-            @RequestParam(defaultValue = "3") int pageSize,
-            @RequestParam(defaultValue = "time") String sort,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "") String filter
-    )
-    {
-        Sort sortObject = Sort.by(sort);
-        if (order.equals("asc")) sortObject = sortObject.ascending();
-        if (order.equals("desc")) sortObject = sortObject.descending();
-
-        Iterable<Rental> rentals = rentalService.getRentals(filter, sortObject, page, pageSize);
-        log.trace("Get rentals page {} with filter {}, sort by {}, order {}: {}", page, filter, sort, order, rentals);
-        return rentalConverter.toDtos(rentals);
-    }
 }
