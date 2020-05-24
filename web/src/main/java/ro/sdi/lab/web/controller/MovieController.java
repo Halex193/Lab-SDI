@@ -108,22 +108,4 @@ public class MovieController
     {
         return movieConverter.toDtos(movieService.filterMoviesByGenre(genre));
     }
-
-    @RequestMapping(value = "/movies/{page}", method = GET)
-    public List<MovieDto> getMovies(
-            @PathVariable int page,
-            @RequestParam(defaultValue = "3") int pageSize,
-            @RequestParam(defaultValue = "id") String sort,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "") String filter
-    )
-    {
-        Sort sortObject = Sort.by(sort);
-        if (order.equals("asc")) sortObject = sortObject.ascending();
-        if (order.equals("desc")) sortObject = sortObject.descending();
-
-        Iterable<Movie> movies = movieService.getMovies(filter, sortObject, page, pageSize);
-        log.trace("Get movies page {} with filter {}, sort by {}, order {}: {}", page, filter, sort, order, movies);
-        return movieConverter.toDtos(movies);
-    }
 }

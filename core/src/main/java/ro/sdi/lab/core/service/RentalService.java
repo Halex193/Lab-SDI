@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,13 +30,17 @@ public class RentalService
     public static final Logger log = LoggerFactory.getLogger(RentalService.class);
     private final ClientService clientService;
     private final MovieService movieService;
+    public DateTimeFormatter formatter;
 
-    public DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-
-    public RentalService(ClientService clientService, MovieService movieService)
+    public RentalService(
+            ClientService clientService,
+            MovieService movieService,
+            DateTimeFormatter formatter
+    )
     {
         this.clientService = clientService;
         this.movieService = movieService;
+        this.formatter = formatter;
     }
 
     /**
@@ -51,37 +56,7 @@ public class RentalService
     @Transactional
     public void addRental(int movieId, int clientId, String time)
     {
-        Movie movie = movieService
-                .findOne(movieId)
-                .orElseThrow(() -> new ElementNotFoundException(String.format(
-                        "Movie %d does not exist",
-                        movieId
-                )));
-        Client client = clientService
-                .findOne(clientId)
-                .orElseThrow(() -> new ElementNotFoundException(String.format(
-                        "Client %d does not exist",
-                        clientId
-                )));
 
-        Rental rental;
-        LocalDateTime dateTime;
-        try
-        {
-            if (time.equals("now"))
-                dateTime = LocalDateTime.now();
-            else
-                dateTime = LocalDateTime.parse(time, formatter);
-            rental = new Rental(movie, client, dateTime);
-        }
-        catch (DateTimeParseException e)
-        {
-            throw new DateTimeInvalidException("Date and time invalid");
-        }
-        log.trace("Adding rental {}", rental);
-
-        client.rentMovie(movie, dateTime);
-        clientService.clientRepository.save(client);
     }
 
     /**
@@ -94,30 +69,7 @@ public class RentalService
     @Transactional
     public void deleteRental(int movieId, int clientId)
     {
-        log.trace("Removing rental with id {} {}", movieId, clientId);
 
-        Movie movie = movieService
-                .findOne(movieId)
-                .orElseThrow(() -> new ElementNotFoundException(String.format(
-                        "Movie %d does not exist",
-                        movieId
-                )));
-        Client client = clientService
-                .findOne(clientId)
-                .orElseThrow(() -> new ElementNotFoundException(String.format(
-                        "Client %d does not exist",
-                        clientId
-                )));
-        if (!client.getMovies().stream().anyMatch((m) -> m == movie))
-        {
-            throw new ElementNotFoundException(String.format(
-                    "Rental of movie %d and client %d does not exist",
-                    movieId,
-                    clientId
-            ));
-        }
-        client.deleteMovie(movie);
-        clientService.clientRepository.save(client);
     }
 
     /**
@@ -127,8 +79,7 @@ public class RentalService
      */
     public List<Rental> getRentals()
     {
-        log.trace("Retrieving all rentals");
-        return clientService.clientRepository.getAllRentals();
+        return Collections.emptyList();
     }
 
     /**
@@ -142,53 +93,18 @@ public class RentalService
      */
     public void updateRental(int movieId, int clientId, String time)
     {
-        checkRentalID(movieId, clientId);
-        Rental rental;
-        try
-        {
-            rental = new Rental(movieId, clientId, LocalDateTime.parse(time, formatter));
-        }
-        catch (DateTimeParseException e)
-        {
-            throw new DateTimeInvalidException("Date and time invalid");
-        }
-        rentalValidator.validate(rental);
-        log.trace("Updating rental {}", rental);
-        rentalRepository.update(rental)
-                        .orElseThrow(() -> new ElementNotFoundException(String.format(
-                                "Rental of movie %d and client %d does not exist",
-                                movieId,
-                                clientId
-                        )));
+
     }
 
     public Iterable<Rental> filterRentalsByMovieName(String name)
     {
-        log.trace("Filtering rentals by the movie name {}", name);
-        String regex = ".*" + name + ".*";
-        return StreamSupport.stream(rentalRepository.findAll().spliterator(), false)
-                            .filter(rental -> movieService.findOne(rental.getId().getMovieId())
-                                                          .filter(t -> t.getName()
-                                                                        .matches(regex))
-                                                          .isPresent())
-                            .collect(Collectors.toUnmodifiableList());
+        return Collections.emptyList();
     }
 
     public List<Rental> getRentals(String dateFilter, Sort sort, int page, int pageSize)
     {
-        return rentalRepository.findAll(
-                filterByDate(dateFilter),
-                PageRequest.of(page, pageSize, sort)
-        );
+        return Collections.emptyList();
     }
 
-    private Specification<Rental> filterByDate(String dateFilter)
-    {
-        if (dateFilter.isEmpty()) return (root, query, criteriaBuilder) ->
-                criteriaBuilder.and();
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.<LocalDateTime>get(
-                        "time"), LocalDateTime.parse(dateFilter, formatter));
-    }
 
 }

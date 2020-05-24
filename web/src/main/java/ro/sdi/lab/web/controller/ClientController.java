@@ -102,22 +102,4 @@ public class ClientController
     {
         return clientConverter.toDtos(clientService.filterClientsByName(name));
     }
-
-    @RequestMapping(value = "/clients/{page}", method = GET)
-    public List<ClientDto> getClients(
-            @PathVariable int page,
-            @RequestParam(defaultValue = "3") int pageSize,
-            @RequestParam(defaultValue = "id") String sort,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "") String filter
-            )
-    {
-        Sort sortObject = Sort.by(sort);
-        if (order.equals("asc")) sortObject = sortObject.ascending();
-        if (order.equals("desc")) sortObject = sortObject.descending();
-
-        Iterable<Client> clients = clientService.getClients(filter, sortObject, page, pageSize);
-        log.trace("Get clients page {} with filter {}, sort by {}, order {}: {}", page, filter, sort, order, clients);
-        return clientConverter.toDtos(clients);
-    }
 }

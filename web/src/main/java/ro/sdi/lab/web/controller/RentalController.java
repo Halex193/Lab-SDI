@@ -58,8 +58,8 @@ public class RentalController
         try
         {
             rentalService.addRental(
-                    rental.getId().getMovieId(),
-                    rental.getId().getClientId(),
+                    rental.getMovie().getId(),
+                    rental.getClient().getId(),
                     formatter.format(rental.getTime())
             );
         }
@@ -82,12 +82,12 @@ public class RentalController
         catch (ElementNotFoundException e)
         {
             log.trace(
-                    "Rental with id {} could not be deleted",
-                    new Rental.RentalID(movieId, clientId)
+                    "Rental with id {}-{} could not be deleted",
+                    movieId, clientId
             );
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        log.trace("Rental with id {} was deleted", new Rental.RentalID(movieId, clientId));
+        log.trace("Rental with id {}-{} was deleted", movieId, clientId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -98,23 +98,21 @@ public class RentalController
             @RequestBody RentalDto rentalDto
     )
     {
-        Rental rental = rentalConverter.toModel(rentalDto);
         try
         {
-            rentalService.updateRental(movieId, clientId, formatter.format(rental.getTime()));
+            rentalService.updateRental(movieId, clientId, rentalDto.getTime());
         }
         catch (ElementNotFoundException e)
         {
             log.trace(
-                    "Rental with id {} could not be updated",
-                    new Rental.RentalID(movieId, clientId)
+                    "Rental with id {}-{} could not be updated",
+                    movieId, clientId
             );
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         log.trace(
-                "Rental with id {} was updated: {}",
-                new Rental.RentalID(movieId, clientId),
-                rental
+                "Rental with id {}-{} was updated: {}",
+                movieId, clientId, rentalDto
         );
         return new ResponseEntity<>(HttpStatus.OK);
     }

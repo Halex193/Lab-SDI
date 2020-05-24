@@ -23,18 +23,6 @@ public class RentalValidator implements Validator<Rental>
     @Override
     public void validate(Rental entity) throws ValidatorException
     {
-        Optional.of(entity)
-                .filter(rental -> rental.getId().getClientId() >= 0)
-                .orElseThrow(() -> new ValidatorException(String.format(
-                        "Rental %s has an invalid client ID",
-                        entity.toString()
-                )));
-        Optional.of(entity)
-                .filter(rental -> rental.getId().getMovieId() >= 0)
-                .orElseThrow(() -> new ValidatorException(String.format(
-                        "Rental %s has an invalid movie ID",
-                        entity.toString()
-                )));
-        hibernateValidation(entity, validator);
+
     }
 }

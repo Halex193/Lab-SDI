@@ -16,15 +16,7 @@ import ro.sdi.lab.core.config.JPAConfig;
 import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Rental;
-import ro.sdi.lab.core.model.copyadapters.ClientCopyAdapter;
-import ro.sdi.lab.core.model.copyadapters.CopyAdapter;
-import ro.sdi.lab.core.model.copyadapters.MovieCopyAdapter;
-import ro.sdi.lab.core.model.copyadapters.RentalCopyAdapter;
-import ro.sdi.lab.core.repository.DatabaseRepository;
 import ro.sdi.lab.core.repository.Repository;
-import ro.sdi.lab.core.repository.tableadapters.ClientTableAdapter;
-import ro.sdi.lab.core.repository.tableadapters.MovieTableAdapter;
-import ro.sdi.lab.core.repository.tableadapters.RentalTableAdapter;
 import ro.sdi.lab.core.validation.ClientValidator;
 import ro.sdi.lab.core.validation.MovieValidator;
 import ro.sdi.lab.core.validation.RentalValidator;
@@ -47,40 +39,6 @@ public class Config
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-
-    @Bean
-    Repository<Integer, Client> clientRepository(
-            ClientTableAdapter clientTableAdapter,
-            CopyAdapter<Client> clientCopyAdapter
-    )
-    {
-        return new DatabaseRepository<>(clientTableAdapter, clientCopyAdapter);
-    }
-
-    @Bean
-    Repository<Integer, Movie> movieRepository(
-            MovieTableAdapter movieTableAdapter,
-            CopyAdapter<Movie> movieCopyAdapter
-    )
-    {
-        return new DatabaseRepository<>(movieTableAdapter, movieCopyAdapter);
-    }
-
-    @Bean
-    Repository<Rental.RentalID, Rental> rentalRepository(
-            RentalTableAdapter rentalTableAdapter,
-            CopyAdapter<Rental> rentalCopyAdapter
-    )
-    {
-        return new DatabaseRepository<>(rentalTableAdapter, rentalCopyAdapter);
-    }
-
-    @Bean
-    RentalValidator rentalValidator()
-    {
-        return new RentalValidator();
-    }
-
     @Bean
     MovieValidator movieValidator()
     {
@@ -91,12 +49,6 @@ public class Config
     ClientValidator clientValidator()
     {
         return new ClientValidator();
-    }
-
-    @Bean
-    ExecutorService executorService()
-    {
-        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     @Bean

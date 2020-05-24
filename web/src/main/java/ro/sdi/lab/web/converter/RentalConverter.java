@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+import jdk.jshell.spi.ExecutionControl;
 import ro.sdi.lab.core.model.Rental;
 import ro.sdi.lab.web.controller.RentalController;
 import ro.sdi.lab.web.dto.RentalDto;
@@ -14,19 +15,15 @@ public class RentalConverter implements Converter<Rental, RentalDto>
     @Override
     public Rental toModel(RentalDto rentalDto)
     {
-        return new Rental(
-                rentalDto.getMovieId(),
-                rentalDto.getClientId(),
-                LocalDateTime.parse(rentalDto.getTime(), RentalController.formatter)
-        );
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
     public RentalDto toDto(Rental rental)
     {
         return RentalDto.builder()
-                        .movieId(rental.getId().getMovieId())
-                        .clientId(rental.getId().getClientId())
+                        .movieId(rental.getMovie().getId())
+                        .clientId(rental.getClient().getId())
                         .time(RentalController.formatter.format(rental.getTime()))
                         .build();
     }
