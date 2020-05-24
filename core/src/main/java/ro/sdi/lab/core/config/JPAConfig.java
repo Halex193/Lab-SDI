@@ -26,7 +26,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 @Configuration
-@EnableJpaRepositories({"ro.sdi.lab.core.repository.tableadapters"})
+@EnableJpaRepositories({"ro.sdi.lab.core.repository"})
 @EnableTransactionManagement
 //@EnableCaching
 public class JPAConfig

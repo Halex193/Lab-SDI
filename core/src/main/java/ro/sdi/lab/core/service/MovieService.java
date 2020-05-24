@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Movie;
+import ro.sdi.lab.core.repository.MovieRepository;
 import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
@@ -19,11 +20,11 @@ import ro.sdi.lab.core.validation.Validator;
 public class MovieService
 {
     public static final Logger log = LoggerFactory.getLogger(MovieService.class);
-    Repository<Integer, Movie> movieRepository;
+    MovieRepository movieRepository;
     Validator<Movie> movieValidator;
 
     public MovieService(
-            Repository<Integer, Movie> movieRepository,
+            MovieRepository movieRepository,
             Validator<Movie> movieValidator
     )
     {

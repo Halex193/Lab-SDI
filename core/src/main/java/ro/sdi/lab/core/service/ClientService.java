@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Client;
+import ro.sdi.lab.core.repository.ClientRepository;
 import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
@@ -20,11 +21,11 @@ public class ClientService
 {
     public static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
-    Repository<Integer, Client> clientRepository;
+    ClientRepository clientRepository;
     Validator<Client> clientValidator;
 
     public ClientService(
-            Repository<Integer, Client> clientRepository,
+            ClientRepository clientRepository,
             Validator<Client> clientValidator
     )
     {
