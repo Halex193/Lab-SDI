@@ -22,4 +22,9 @@ export class ReportService
   {
     return this.httpClient.get<ClientGenre[]>(this.baseURL + "/genres");
   }
+
+  logEntities()
+  {
+    this.httpClient.post(this.baseURL + "/log", "").subscribe();
+  }
 }

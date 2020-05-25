@@ -47,4 +47,9 @@ export class ReportsComponent implements OnInit {
         () => this.errorMessage = "Client genres not available"
       );
   }
+
+  logEntities()
+  {
+    this.service.logEntities()
+  }
 }

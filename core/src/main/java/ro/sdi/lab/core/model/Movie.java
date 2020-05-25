@@ -100,7 +100,12 @@ public class Movie extends Entity<Integer> implements Serializable
     }
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<Rental> movieRentals = new HashSet<>();
+    public Set<Rental> movieRentals = new HashSet<>();
+
+    public Set<Rental> getRentals()
+    {
+        return movieRentals.stream().collect(Collectors.toUnmodifiableSet());
+    }
 
     public Set<Client> getClients()
     {

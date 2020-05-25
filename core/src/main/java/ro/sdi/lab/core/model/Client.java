@@ -73,9 +73,9 @@ public class Client extends Entity<Integer> implements Serializable
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Rental> clientRentals = new HashSet<>();
 
-    public void deleteMovie(Movie movie)
+    public Set<Rental> getRentals()
     {
-        clientRentals.removeIf(rental -> rental.getMovie().id.equals(movie.id));
+        return clientRentals.stream().collect(Collectors.toUnmodifiableSet());
     }
 
     public Set<Movie> getMovies()
@@ -83,6 +83,11 @@ public class Client extends Entity<Integer> implements Serializable
         return clientRentals.stream()
                             .map(Rental::getMovie)
                             .collect(Collectors.toUnmodifiableSet());
+    }
+
+    public void deleteMovie(Movie movie)
+    {
+        clientRentals.removeIf(rental -> rental.getMovie().id.equals(movie.id));
     }
 
     public void rentMovie(Movie movie, LocalDateTime time)
