@@ -3,6 +3,8 @@ package ro.sdi.lab.core.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,7 @@ import ro.sdi.lab.core.repository.custom.CustomRepository;
 import ro.sdi.lab.core.repository.custom.CustomRepositoryNative;
 import ro.sdi.lab.core.repository.custom.CustomRepositoryJPQL;
 import ro.sdi.lab.core.repository.custom.CustomRepositoryCriteria;
+import ro.sdi.lab.core.service.Service;
 
 @Configuration
 @EnableJpaRepositories({"ro.sdi.lab.core.repository"})
@@ -36,6 +39,7 @@ import ro.sdi.lab.core.repository.custom.CustomRepositoryCriteria;
 //@EnableCaching
 public class JPAConfig
 {
+    public static final Logger log = LoggerFactory.getLogger(JPAConfig.class);
 
     @Value("${db.jdbcUrl}")
     private String jdbcUrl;
@@ -123,6 +127,7 @@ public class JPAConfig
     @Bean
     CustomRepository customRepository()
     {
+        log.trace("Custom repository configuration: " + configuration);
         switch(configuration)
         {
             case "JPQL":
