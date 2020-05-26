@@ -5,13 +5,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
+import ro.sdi.lab.core.exception.DateTimeInvalidException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
+import ro.sdi.lab.core.model.Client;
 import ro.sdi.lab.core.model.Movie;
+import ro.sdi.lab.core.model.Rental;
+import ro.sdi.lab.core.repository.ClientRepository;
 import ro.sdi.lab.core.repository.MovieRepository;
 import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
@@ -21,15 +28,21 @@ public class MovieService
 {
     public static final Logger log = LoggerFactory.getLogger(MovieService.class);
     MovieRepository movieRepository;
+    ClientRepository clientRepository;
     Validator<Movie> movieValidator;
+    public DateTimeFormatter formatter;
 
     public MovieService(
             MovieRepository movieRepository,
-            Validator<Movie> movieValidator
+            ClientRepository clientRepository,
+            Validator<Movie> movieValidator,
+            DateTimeFormatter formatter
     )
     {
         this.movieRepository = movieRepository;
+        this.clientRepository = clientRepository;
         this.movieValidator = movieValidator;
+        this.formatter = formatter;
     }
 
     /**
@@ -133,5 +146,61 @@ public class MovieService
     public Optional<Movie> findOne(int movieId)
     {
         return movieRepository.findById(movieId);
+    }
+
+    /**
+     * This function updates a rental based on the movie ID and client ID with its new time
+     *
+     * @param movieId:  the ID of the movie
+     * @param clientId: the ID of the client
+     * @param time:     date and time - the object of updation
+     * @throws ElementNotFoundException if the movie or client does not exist in the repository or
+     *                                  if the rental is nowhere to be found
+     */
+    @Transactional
+    public void updateRental(int movieId, int clientId, String time)
+    {
+        Movie movie = movieRepository
+                .findById(movieId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Movie %d does not exist",
+                        movieId
+                )));
+        Client client = clientRepository
+                .getClientAndMovies(clientId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Client %d does not exist",
+                        clientId
+                )));
+
+        Rental rental;
+        LocalDateTime dateTime;
+        try
+        {
+            if (time.equals("now"))
+                dateTime = LocalDateTime.now();
+            else
+                dateTime = LocalDateTime.parse(time, formatter);
+            rental = new Rental(movie, client, dateTime);
+        }
+        catch (DateTimeParseException e)
+        {
+            throw new DateTimeInvalidException("Date and time invalid");
+        }
+        log.trace("Updating rental {}", rental);
+
+        client.updateRentalTime(movie, dateTime);
+        clientRepository.save(client);
+    }
+
+    /**
+     * This function returns an iterable collection of the current state of the rentals in the repository
+     *
+     * @return all: an iterable collection of rentals
+     */
+    public List<Rental> getRentals()
+    {
+        log.trace("Retrieving all rentals");
+        return movieRepository.getAllRentals();
     }
 }

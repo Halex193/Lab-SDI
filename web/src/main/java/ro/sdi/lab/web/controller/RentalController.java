@@ -3,13 +3,11 @@ package ro.sdi.lab.web.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.format.DateTimeFormatter;
@@ -17,11 +15,10 @@ import java.util.List;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
-import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Rental;
-import ro.sdi.lab.core.service.RentalService;
+import ro.sdi.lab.core.service.ClientService;
+import ro.sdi.lab.core.service.MovieService;
 import ro.sdi.lab.web.converter.RentalConverter;
-import ro.sdi.lab.web.dto.MovieDto;
 import ro.sdi.lab.web.dto.RentalDto;
 
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
@@ -37,7 +34,10 @@ public class RentalController
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
 
     @Autowired
-    private RentalService rentalService;
+    private ClientService clientService;
+
+    @Autowired
+    private MovieService movieService;
 
     @Autowired
     private RentalConverter rentalConverter;
@@ -46,7 +46,7 @@ public class RentalController
     @RequestMapping(value = "/rentals", method = GET)
     public List<RentalDto> getRentals()
     {
-        Iterable<Rental> rentals = rentalService.getRentals();
+        Iterable<Rental> rentals = movieService.getRentals();
         log.trace("Get rentals: {}", rentals);
         return rentalConverter.toDtos(rentals);
     }
@@ -56,7 +56,7 @@ public class RentalController
     {
         try
         {
-            rentalService.addRental(
+            clientService.addRental(
                     rentalDto.getMovieId(),
                     rentalDto.getClientId(),
                     rentalDto.getTime()
@@ -76,7 +76,7 @@ public class RentalController
     {
         try
         {
-            rentalService.deleteRental(movieId, clientId);
+            clientService.deleteRental(movieId, clientId);
         }
         catch (ElementNotFoundException e)
         {
@@ -99,7 +99,7 @@ public class RentalController
     {
         try
         {
-            rentalService.updateRental(movieId, clientId, rentalDto.getTime());
+            movieService.updateRental(movieId, clientId, rentalDto.getTime());
         }
         catch (ElementNotFoundException e)
         {
