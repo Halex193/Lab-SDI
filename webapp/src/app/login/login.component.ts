@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from "@angular/router";
 import {LoginService} from "./login.service";
 import {CookieService} from "ngx-cookie-service";
+import {ReportService} from "../reports/report.service";
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,7 @@ export class LoginComponent implements OnInit
   password: string = ""
   error: string = ""
 
-  constructor(protected service: LoginService, protected router: Router, private cookieService: CookieService)
+  constructor(protected service: LoginService, protected router: Router, private cookieService: CookieService, private reportService: ReportService)
   {
   }
 
@@ -30,7 +31,10 @@ export class LoginComponent implements OnInit
       {
         if (result.status == 200)
         {
-          this.cookieService.set("authenticated", "true")
+          this.reportService.getClientGenres().subscribe(
+            () => this.cookieService.set("authenticated", "admin"),
+            () => this.cookieService.set("authenticated", "basic")
+          )
           this.router.navigate(['/clients'])
         }
       }, () => this.error = "Invalid credentials!")

@@ -4,7 +4,7 @@
     <a routerLink="/clients" routerLinkActive="active">Clients</a>
     <a routerLink="/movies" routerLinkActive="active">Movies</a>
     <a routerLink="/rentals" routerLinkActive="active">Rentals</a>
-    <a routerLink="/reports" routerLinkActive="active">Reports</a>
+    <a *ngIf="reportsAvailable()" routerLink="/reports" routerLinkActive="active">Reports</a>
     <a (click)="logout()">Log out</a>
   </nav>
 </div>
