@@ -34,7 +34,7 @@ export class ReportsComponent implements OnInit {
           this.rentedMovieStatistics = items;
           console.log("Received rented movie statistics: ", items)
         },
-        () => this.errorMessage = "Rented movie statistics not available"
+        () => this.errorMessage = "Unaunthorized"
       );
 
     this.service.getClientGenres()
@@ -44,7 +44,7 @@ export class ReportsComponent implements OnInit {
           this.clientGenres = items;
           console.log("Received client genres: ", items)
         },
-        () => this.errorMessage = "Client genres not available"
+        () => this.errorMessage = "Unaunthorized"
       );
   }
 

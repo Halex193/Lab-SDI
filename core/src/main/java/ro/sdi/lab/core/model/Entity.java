@@ -8,7 +8,10 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import lombok.NoArgsConstructor;
+
 @MappedSuperclass
+@NoArgsConstructor
 public abstract class Entity<ID extends Serializable> implements Serializable
 {
 

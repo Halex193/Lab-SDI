@@ -4,13 +4,15 @@ import {ClientsComponent} from "./clients/clients.component";
 import {MoviesComponent} from "./movies/movies.component";
 import {RentalsComponent} from "./rentals/rentals.component";
 import {ReportsComponent} from "./reports/reports.component";
+import {LoginComponent} from "./login/login.component";
 
 
 const routes: Routes = [
   {path: "clients", component: ClientsComponent},
   {path: "movies", component: MoviesComponent},
   {path: "rentals", component: RentalsComponent},
-  {path: "reports", component: ReportsComponent}
+  {path: "reports", component: ReportsComponent},
+  {path: "login", component: LoginComponent}
 ];
 
 @NgModule({

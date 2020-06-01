@@ -15,16 +15,16 @@ export class ReportService
 
   getRentedMovieStatistics(): Observable<RentedMovieStatistic[]>
   {
-    return this.httpClient.get<RentedMovieStatistic[]>(this.baseURL + "/movies");
+    return this.httpClient.get<RentedMovieStatistic[]>(this.baseURL + "/movies", {withCredentials: true});
   }
 
   getClientGenres(): Observable<ClientGenre[]>
   {
-    return this.httpClient.get<ClientGenre[]>(this.baseURL + "/genres");
+    return this.httpClient.get<ClientGenre[]>(this.baseURL + "/genres", {withCredentials: true});
   }
 
   logEntities()
   {
-    this.httpClient.post(this.baseURL + "/log", "").subscribe();
+    this.httpClient.post(this.baseURL + "/log", "", {withCredentials: true}).subscribe();
   }
 }

@@ -12,6 +12,8 @@ import { ReportsComponent } from './reports/reports.component';
 import {MovieService} from "./movies/movie.service";
 import {RentalService} from "./rentals/rental.service";
 import {ReportService} from "./reports/report.service";
+import { LoginComponent } from './login/login.component';
+import {LoginService} from "./login/login.service";
 
 @NgModule({
   declarations: [
@@ -19,7 +21,8 @@ import {ReportService} from "./reports/report.service";
     ClientsComponent,
     MoviesComponent,
     RentalsComponent,
-    ReportsComponent
+    ReportsComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,
@@ -27,7 +30,7 @@ import {ReportService} from "./reports/report.service";
     HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [ClientService, MovieService, RentalService, ReportService],
+  providers: [ClientService, MovieService, RentalService, ReportService, LoginService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
