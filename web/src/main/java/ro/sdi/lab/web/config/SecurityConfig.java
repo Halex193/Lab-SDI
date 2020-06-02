@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -97,19 +100,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
+                .logout()
+                .logoutUrl("/api/logout")
+                .logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)))
+                .and()
                 .authorizeRequests()
                 .antMatchers("/api/clients").hasAnyRole(UserRole.ADMIN.toString(), UserRole.BASIC.toString())
                 .antMatchers("/api/movies").hasAnyRole(UserRole.ADMIN.toString(), UserRole.BASIC.toString())
                 .antMatchers("/api/rentals").hasAnyRole(UserRole.ADMIN.toString(), UserRole.BASIC.toString())
                 .antMatchers("/api/statistics/*").hasRole(UserRole.ADMIN.toString())
-                .antMatchers("/login").permitAll()
+                .antMatchers("/api/login").permitAll()
+                .antMatchers("/api/logout").authenticated()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
+                .formLogin().loginProcessingUrl("/api/login")
                 .successHandler(mySavedRequestAwareAuthenticationSuccessHandler)
-                .failureHandler(new SimpleUrlAuthenticationFailureHandler())
-                .and()
-                .logout();
+                .failureHandler(new SimpleUrlAuthenticationFailureHandler());
     }
 
     @Bean

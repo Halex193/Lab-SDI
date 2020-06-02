@@ -57,9 +57,6 @@ public class JPAConfig
     @Value("${db.configuration}")
     private String configuration;
 
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
-
     public Database database;
 
     @Profile("prod")
@@ -94,7 +91,7 @@ public class JPAConfig
         log.trace("Using MySQL database for testing");
         database = Database.MYSQL;
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/MovieRentalDB");
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/MovieRentalDB?useSSL=false");
         config.setUsername("root");
         config.setPassword("");
         config.addDataSourceProperty("cachePrepStmts", "true");
@@ -102,7 +99,7 @@ public class JPAConfig
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         try
         {
-            DriverManager.registerDriver(new com.mysql.jdbc.Driver());
+            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
         }
         catch (SQLException e)
         {

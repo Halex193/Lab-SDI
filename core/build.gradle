@@ -20,7 +20,7 @@ dependencies {
     compile 'org.hibernate.validator:hibernate-validator-cdi:6.1.5.Final'
     annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.4.9.Final')
 
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.12'
 
     //dbunit-test-config
     compile group: 'com.zaxxer', name: 'HikariCP', version: "$hikariVersion"

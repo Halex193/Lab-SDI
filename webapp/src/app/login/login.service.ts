@@ -4,7 +4,7 @@ import {Injectable} from "@angular/core";
 @Injectable()
 export class LoginService
 {
-  baseURL = 'http://localhost:8080/login'
+  baseURL = 'http://localhost:8080/api/login'
 
   constructor(private httpClient: HttpClient)
   {
