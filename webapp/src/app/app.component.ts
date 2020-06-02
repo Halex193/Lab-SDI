@@ -18,7 +18,7 @@ export class AppComponent
   loggedIn()
   {
     let loggedIn: boolean = this.cookieService.check("authenticated");
-    if (!loggedIn && this.router.url != '/login')
+    if (!loggedIn && !(this.router.url === '/login' || this.router.url === '/'))
     {
       this.router.navigate(['/login'])
     }

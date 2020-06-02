@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <client id="1" name="Andrei"/>
+  <client id="2" name="Mihai"/>
+  <client id="3" name="Maria"/>
+  <app_user id="1" first_name="admin" last_name="admin" password="$2a$10$kMqhKoyuJmN5BV3Z59oqY.bjgL.dv48rsr4vpZtg8nVi0mUtPZ9XW" user_name="admin" user_role="ADMIN"/>
+  <app_user id="2" first_name="normal" last_name="normal" password="$2a$10$7X.eyFKYJkCaJ2CRuLDRkOwINbNwxcIxBq4osW.DZHArbRz66GBbG" user_name="normal" user_role="BASIC"/>
+  <movie id="1" genre="genre1" name="Movie1" rating="80"/>
+  <movie id="2" genre="genre1" name="Movie2" rating="50"/>
+  <movie id="3" genre="genre2" name="Movie3" rating="10"/>
+  <rental time="2012-12-12 12:12:00.0" client="1" movie="1"/>
+  <rental time="2012-12-12 12:12:00.0" client="2" movie="1"/>
+  <rental time="2012-12-12 12:12:00.0" client="3" movie="1"/>
+  <rental time="2012-12-12 12:12:00.0" client="3" movie="2"/>
+  <rental time="2012-12-12 12:12:00.0" client="2" movie="3"/>
+  <rental time="2012-12-12 12:12:00.0" client="1" movie="3"/>
+</dataset>
