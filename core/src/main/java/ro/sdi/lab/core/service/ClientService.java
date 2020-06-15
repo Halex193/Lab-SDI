@@ -3,14 +3,23 @@ package ro.sdi.lab.core.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import ro.sdi.lab.core.exception.AlreadyExistingElementException;
+import ro.sdi.lab.core.exception.DateTimeInvalidException;
 import ro.sdi.lab.core.exception.ElementNotFoundException;
 import ro.sdi.lab.core.model.Client;
+import ro.sdi.lab.core.model.Movie;
+import ro.sdi.lab.core.model.Rental;
+import ro.sdi.lab.core.repository.ClientRepository;
+import ro.sdi.lab.core.repository.MovieRepository;
 import ro.sdi.lab.core.repository.Repository;
 import ro.sdi.lab.core.validation.Validator;
 
@@ -19,22 +28,22 @@ public class ClientService
 {
     public static final Logger log = LoggerFactory.getLogger(ClientService.class);
 
-    Repository<Integer, Client> clientRepository;
+    ClientRepository clientRepository;
     Validator<Client> clientValidator;
-    EntityDeletedListener<Client> entityDeletedListener = null;
+    MovieRepository movieRepository;
+    public DateTimeFormatter formatter;
 
     public ClientService(
-            Repository<Integer, Client> clientRepository,
-            Validator<Client> clientValidator
+            ClientRepository clientRepository,
+            Validator<Client> clientValidator,
+            MovieRepository movieRepository,
+            DateTimeFormatter formatter
     )
     {
         this.clientRepository = clientRepository;
         this.clientValidator = clientValidator;
-    }
-
-    public void setEntityDeletedListener(EntityDeletedListener<Client> entityDeletedListener)
-    {
-        this.entityDeletedListener = entityDeletedListener;
+        this.movieRepository = movieRepository;
+        this.formatter = formatter;
     }
 
     /**
@@ -49,15 +58,16 @@ public class ClientService
         Client client = new Client(id, name);
         clientValidator.validate(client);
         log.trace("Adding client {}", client);
-        clientRepository
-                .save(client)
-                .ifPresent(opt ->
-                           {
-                               throw new AlreadyExistingElementException(String.format(
-                                       "Client %d already exists",
-                                       id
-                               ));
-                           });
+
+        clientRepository.findById(id).ifPresent(
+                (item) ->
+                {
+                    throw new AlreadyExistingElementException(String.format(
+                            "Client %d already exists",
+                            id
+                    ));
+                });
+        clientRepository.save(client);
     }
 
     /**
@@ -69,20 +79,14 @@ public class ClientService
     public void deleteClient(int id)
     {
         log.trace("Removing client with id {}", id);
-        clientRepository
-                .delete(id)
-                .ifPresentOrElse(
-                        entity -> Optional
-                                .ofNullable(entityDeletedListener)
-                                .ifPresent(listener -> listener.onEntityDeleted(entity)),
-                        () ->
-                        {
-                            throw new ElementNotFoundException(String.format(
-                                    "Client %d does not exist",
-                                    id
-                            ));
-                        }
-                );
+        if (clientRepository.findById(id).isEmpty())
+        {
+            throw new ElementNotFoundException(String.format(
+                    "Client %d does not exist",
+                    id
+            ));
+        }
+        clientRepository.deleteById(id);
     }
 
     /**
@@ -90,7 +94,7 @@ public class ClientService
      *
      * @return all: an iterable collection of clients
      */
-    public Iterable<Client> getClients()
+    public List<Client> getClients()
     {
         log.trace("Retrieving all clients");
         return clientRepository.findAll();
@@ -103,31 +107,123 @@ public class ClientService
      * @param name: the new name of the client
      * @throws ElementNotFoundException if the client isn't found in the repository based on their ID
      */
+    @Transactional
     public void updateClient(int id, String name)
     {
         Client client = new Client(id, name);
         clientValidator.validate(client);
         log.trace("Updating client {}", client);
-        clientRepository
-                .update(client)
-                .orElseThrow(() -> new ElementNotFoundException(String.format(
-                        "Client %d does not exist",
-                        id
-                )));
+
+        Client oldClient = clientRepository
+                .findById(id)
+                .orElseThrow(() -> new ElementNotFoundException(
+                        String.format(
+                                "Client %d does not exist",
+                                id
+                        )));
+        oldClient.setId(client.getId());
+        oldClient.setName(client.getName());
+        clientRepository.save(oldClient);
     }
 
     public Iterable<Client> filterClientsByName(String name)
     {
         log.trace("Filtering clients by the name {}", name);
         String regex = ".*" + name + ".*";
-        return StreamSupport
-                .stream(clientRepository.findAll().spliterator(), false)
+        return clientRepository.findAll().stream()
                 .filter(client -> client.getName().matches(regex))
                 .collect(Collectors.toUnmodifiableList());
     }
 
     public Optional<Client> findOne(int clientId)
     {
-        return clientRepository.findOne(clientId);
+        return clientRepository.findById(clientId);
     }
+
+    /**
+     * This function adds a rental to the repository
+     *
+     * @param movieId:  the ID of the movie
+     * @param clientId: the ID of the client
+     * @param time:     date and time of rental
+     * @throws ElementNotFoundException        if movie or client doesn't exist in the repository
+     * @throws AlreadyExistingElementException if the rental already exists in the repository
+     * @throws DateTimeInvalidException        if the date and time cannot be parsed
+     */
+    @Transactional
+    public void addRental(int movieId, int clientId, String time)
+    {
+        Movie movie = movieRepository
+                .findById(movieId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Movie %d does not exist",
+                        movieId
+                )));
+        Client client = clientRepository
+                .getClientAndMovies(clientId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Client %d does not exist",
+                        clientId
+                )));
+
+        Rental rental;
+        LocalDateTime dateTime;
+        try
+        {
+            if (time.equals("now"))
+                dateTime = LocalDateTime.now();
+            else
+                dateTime = LocalDateTime.parse(time, formatter);
+            rental = new Rental(movie, client, dateTime);
+        }
+        catch (DateTimeParseException e)
+        {
+            throw new DateTimeInvalidException("Date and time invalid");
+        }
+        log.trace("Adding rental {}", rental);
+        if(client.getMovies().stream().anyMatch(m -> m.getId().equals(movie.getId())))
+        {
+            throw new AlreadyExistingElementException("Rental already exists");
+        }
+        client.rentMovie(movie, dateTime);
+        clientRepository.save(client);
+    }
+
+    /**
+     * This function deletes a rental from the repository
+     *
+     * @param movieId:  the ID of the movie
+     * @param clientId: the ID of the client
+     * @throws ElementNotFoundException if the movie, client don't exist of if the rental itself doesn't exist in the repository
+     */
+    @Transactional
+    public void deleteRental(int movieId, int clientId)
+    {
+        log.trace("Removing rental with id {} {}", movieId, clientId);
+
+        Movie movie = movieRepository
+                .findById(movieId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Movie %d does not exist",
+                        movieId
+                )));
+        Client client = clientRepository
+                .getClientAndMovies(clientId)
+                .orElseThrow(() -> new ElementNotFoundException(String.format(
+                        "Client %d does not exist",
+                        clientId
+                )));
+        if (client.getMovies().stream().noneMatch(m -> m.getId().equals(movie.getId())))
+        {
+            throw new ElementNotFoundException(String.format(
+                    "Rental of movie %d and client %d does not exist",
+                    movieId,
+                    clientId
+            ));
+        }
+        client.deleteMovie(movie);
+        clientRepository.save(client);
+    }
+
+
 }

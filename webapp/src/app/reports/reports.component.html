@@ -1,0 +1,17 @@
+<h2>Reports</h2>
+<h3 style="color: red">{{errorMessage}}</h3>
+<br />
+<h3>Most Rented movies</h3>
+<ul>
+  <li *ngFor="let rentedMovieStatistic of rentedMovieStatistics">
+    Movie name:{{rentedMovieStatistic.movieName}} | Number of rentals:{{rentedMovieStatistic.numberOfRentals}}
+  </li>
+
+</ul>
+<h3>Client preferred genres</h3>
+<ul>
+  <li *ngFor="let clientGenre of clientGenres">
+    Client Id:{{clientGenre.client.id}} | Client Name:{{clientGenre.client.name}} | Preferred genre: {{clientGenre.genre}}
+  </li>
+</ul>
+<button (click)="logEntities()">Log</button>

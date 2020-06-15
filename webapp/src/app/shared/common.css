@@ -1,0 +1,31 @@
+.server-side, .client-side{
+  border : 2px solid beige;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+ul {
+  list-style-type: none;
+}
+
+ul li {
+  background-color: lightblue;
+  width: 500px;
+  height: 30px;
+  text-align: center;
+  transition: background-color 0.3s;
+  cursor: pointer;
+}
+
+ul li:hover {
+  background-color: lightgreen;
+}
+
+.error {
+  color: red;
+}
+
+.validation-error {
+  color:red;
+}

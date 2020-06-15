@@ -1,12 +1,53 @@
 package ro.sdi.lab.core.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+@NamedEntityGraphs({
+        @NamedEntityGraph(
+                name = "movieRentals",
+                attributeNodes = @NamedAttributeNode(value = "movieRentals")
+        ),
+
+
+        @NamedEntityGraph(
+                name = "movieRentalsWithClients",
+                attributeNodes = @NamedAttributeNode(
+                        value = "movieRentals",
+                        subgraph = "rentalClient"
+                ),
+                subgraphs = @NamedSubgraph(
+                        name = "rentalClient",
+                        attributeNodes = @NamedAttributeNode(value = "client")
+                )
+        )
+})
 @javax.persistence.Entity
 public class Movie extends Entity<Integer> implements Serializable
 {
+    @NotNull
+    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Invalid movie name")
     private String name;
+    @NotNull
     private String genre;
+    @NotNull
+    @Min(0)
+    @Max(100)
     private int rating;
 
     public Movie()
@@ -56,5 +97,25 @@ public class Movie extends Entity<Integer> implements Serializable
     public String toString()
     {
         return String.format("Movie[%d, %s, %s, %d]", id, name, genre, rating);
+    }
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    public Set<Rental> movieRentals = new HashSet<>();
+
+    public Set<Rental> getRentals()
+    {
+        return movieRentals.stream().collect(Collectors.toUnmodifiableSet());
+    }
+
+    public Set<Client> getClients()
+    {
+        return movieRentals.stream()
+                            .map(Rental::getClient)
+                            .collect(Collectors.toUnmodifiableSet());
+    }
+
+    public void rentMovie(Client client, LocalDateTime time)
+    {
+        movieRentals.add(new Rental(this, client, time));
     }
 }

@@ -1,5 +1,6 @@
 package ro.sdi.lab.web.converter;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -10,10 +11,10 @@ public interface Converter<Model, Dto>
 
     Dto toDto(Model model);
 
-    default Set<Dto> toDtos(Iterable<Model> models)
+    default List<Dto> toDtos(Iterable<Model> models)
     {
         return StreamSupport.stream(models.spliterator(), false)
                             .map(this::toDto)
-                            .collect(Collectors.toSet());
+                            .collect(Collectors.toList());
     }
 }

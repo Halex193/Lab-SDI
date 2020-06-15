@@ -3,104 +3,105 @@ package ro.sdi.lab.core.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.function.Function;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import ro.sdi.lab.core.model.Client;
-import ro.sdi.lab.core.model.Movie;
 import ro.sdi.lab.core.model.Rental;
 import ro.sdi.lab.core.model.dto.ClientGenre;
 import ro.sdi.lab.core.model.dto.RentedMovieStatistic;
-import ro.sdi.lab.core.repository.Repository;
-import ro.sdi.lab.core.validation.Validator;
+import ro.sdi.lab.core.repository.ClientRepository;
+import ro.sdi.lab.core.repository.MovieRepository;
 
 @org.springframework.stereotype.Service
 public class Service
 {
     public static final Logger log = LoggerFactory.getLogger(Service.class);
 
-    Repository<Integer, Client> clientRepository;
-    Repository<Integer, Movie> movieRepository;
-    Repository<Rental.RentalID, Rental> rentalRepository;
-    Validator<Client> clientValidator;
-    Validator<Movie> movieValidator;
-    Validator<Rental> rentalValidator;
+    private final ClientRepository clientRepository;
+    private final MovieRepository movieRepository;
 
     public Service(
-            Repository<Integer, Client> clientRepository,
-            Repository<Integer, Movie> movieRepository,
-            Repository<Rental.RentalID, Rental> rentalRepository,
-            Validator<Client> clientValidator,
-            Validator<Movie> movieValidator,
-            Validator<Rental> rentalValidator
+            ClientRepository clientRepository,
+            MovieRepository movieRepository
     )
     {
         this.clientRepository = clientRepository;
         this.movieRepository = movieRepository;
-        this.rentalRepository = rentalRepository;
-        this.clientValidator = clientValidator;
-        this.movieValidator = movieValidator;
-        this.rentalValidator = rentalValidator;
     }
 
-    public Iterable<RentedMovieStatistic> getTop10RentedMovies()
+    public List<RentedMovieStatistic> getTop10RentedMovies()
     {
-        log.trace("Retrieving top 10 rented movies");
-        Stream<Rental> rentalStream = StreamSupport.stream(rentalRepository.findAll().spliterator(), false);
-        Map<String, Long> occurrenceMap = rentalStream
-                .map(rental -> movieRepository.findOne(rental.getId().getMovieId()).get().getName())
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-
-        return occurrenceMap
-                .entrySet()
-                .stream()
-                .map(entry -> new RentedMovieStatistic(entry.getKey(), entry.getValue()))
-                .sorted(Comparator.comparingLong(RentedMovieStatistic::getNumberOfRentals).reversed())
-                .limit(10)
-                .collect(Collectors.toUnmodifiableList());
+        return movieRepository.getTop10RentedMovies();
     }
 
     /**
      * Retrieves the most rented genre for each client, or the empty string if the client did not rent any movies
      */
-    public Iterable<ClientGenre> getClientGenres()
+    public List<ClientGenre> getClientGenres()
     {
-        log.trace("Retrieving client favorite genres");
-        return StreamSupport.stream(clientRepository.findAll().spliterator(), false)
-                            .map(client -> new ClientGenre(
-                                         client,
-                                         StreamSupport.stream(
-                                                 rentalRepository.findAll().spliterator(),
-                                                 false
-                                         )
-                                                      .filter(rental -> rental.getId()
-                                                                              .getClientId() == client.getId())
-                                                      .map(this::getMovieGenre)
-                                                      .collect(Collectors.groupingBy(
-                                                              Function.identity(),
-                                                              Collectors.counting()
-                                                      ))
-                                                      .entrySet()
-                                                      .stream()
-                                                      .max(Map.Entry.comparingByValue())
-                                                      .map(Map.Entry::getKey)
-                                                      .orElse("")
-                                 )
-                            )
-                            .collect(Collectors.toUnmodifiableList());
+        return clientRepository.getClientGenres();
     }
 
-    private String getMovieGenre(Rental rental)
+    public void logEntities()
     {
-        return StreamSupport.stream(movieRepository.findAll().spliterator(), false)
-                            .filter(movie -> movie.getId() == rental.getId().getMovieId())
-                            .findAny()
-                            .map(Movie::getGenre)
-                            .orElse("");
+        /*log.debug("Clients with movies: " + clientRepository
+                .findAll()
+                .stream()
+                .map(client -> String.format(
+                        "%s - %s",
+                        client.toString(),
+                        client.getMovies().toString()
+                ))
+                .collect(Collectors.joining(",")));*/
+
+        log.debug("Clients with movies: " + clientRepository
+                          .findClientsWithMovies()
+                          .stream()
+                          .map(client -> String.format(
+                                  "%s - %s",
+                                  client.toString(),
+                                  client.getMovies().toString()
+                          ))
+                          .collect(Collectors.joining(",")));
+
+        log.debug("Clients with rentals: " + clientRepository
+                          .findClientsWithRentals()
+                          .stream()
+                          .map(client -> String.format(
+                                  "%s - %s",
+                                  client.toString(),
+                                  client.getRentals()
+                                          .stream()
+                                          .map(Rental::getTime)
+                                          .map(LocalDateTime::toString)
+                                          .collect(Collectors.joining(","))
+                          ))
+                          .collect(Collectors.joining(",")));
+
+        log.debug("Movies with clients: " + movieRepository
+                .findMoviesWithClients()
+                .stream()
+                .map(movie -> String.format(
+                        "%s - %s",
+                        movie.toString(),
+                        movie.getClients().toString()
+                ))
+                .collect(Collectors.joining(",")));
+
+        log.debug("Movies with rentals: " + movieRepository
+                .findMoviesWithRentals()
+                .stream()
+                .map(movie -> String.format(
+                        "%s - %s",
+                        movie.toString(),
+                        movie.getRentals()
+                                .stream()
+                                .map(Rental::getTime)
+                                .map(LocalDateTime::toString)
+                                .collect(Collectors.joining(","))
+                ))
+                .collect(Collectors.joining(",")));
     }
+
 }

@@ -13,4 +13,18 @@ dependencies {
     compile group: 'com.zaxxer', name: 'HikariCP', version: "$hikariVersion"
 
     compile group: 'javax.xml.bind', name: 'jaxb-api', version: "$jaxbapiVersion"
+
+    //Hibernate validation
+    compile 'org.hibernate:hibernate-validator:6.1.5.Final'
+    compile 'org.glassfish:jakarta.el:3.0.3'
+    compile 'org.hibernate.validator:hibernate-validator-cdi:6.1.5.Final'
+    annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.4.9.Final')
+
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.12'
+
+    //dbunit-test-config
+    compile group: 'com.zaxxer', name: 'HikariCP', version: "$hikariVersion"
+    compile group: 'org.dbunit', name: 'dbunit', version: "$dbUnitVersion"
+    compile group: 'com.h2database', name: 'h2', version: "$h2DbVersion"
+    compile group: 'com.github.springtestdbunit', name: 'spring-test-dbunit', version: "$springtestdbunitVersion"
 }

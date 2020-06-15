@@ -1,52 +1,26 @@
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {map} from "rxjs/operators";
 import {Client} from "./client.model";
 import {Injectable} from "@angular/core";
+import {Service} from "../shared/Service";
 
-export class ClientList
-{
-  clients: Client[]
-}
+const URL = 'http://localhost:8080/api/clients';
 
 @Injectable()
-export class ClientService
+export class ClientService extends Service<Client>
 {
-  private URL = 'http://localhost:8080/api/clients';
 
-  constructor(private httpClient: HttpClient)
+  identify(baseURL: any, id: string): string
   {
+    return URL + "/" + id
   }
 
-  getClients(): Observable<Client[]>
+  constructor(httpClient: HttpClient)
   {
-    return this.httpClient.get<ClientList>(this.URL).pipe(map(clientList => clientList.clients));
+    super(httpClient, URL);
   }
 
-  /*getClient(id: number): Observable<Client> {
-    return this.getClients()
-      .pipe(
-        map(students => students.find(student => student.id === id))
-      );
-  }*/
-
-  addClient(client: Client)
+  getId(client: Client): string
   {
-    console.log("addClient", client);
-
-    return this.httpClient.post<Client>(this.URL, client);
+    return client.id.toString()
   }
-
-  update(client)
-  {
-    const url = `${this.URL}/${client.id}`;
-    return this.httpClient.put<Client>(url, client);
-  }
-
-  deleteClient(id: number)
-  {
-    const url = `${this.URL}/${id}`;
-    return this.httpClient.delete(url);
-  }
-
 }

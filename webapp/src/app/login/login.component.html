@@ -1,0 +1,16 @@
+<br />
+<br />
+<h3 style="color: red">{{error}}</h3>
+<div>
+  <label>Username:
+    <input type="text" [(ngModel)]="username" placeholder="username">
+  </label>
+</div>
+
+<div>
+  <label>Password:
+    <input type="password" [(ngModel)]="password" placeholder="password" >
+  </label>
+</div>
+
+<button (click)="login()">Log in</button>

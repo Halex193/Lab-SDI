@@ -6,7 +6,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
-          <factory-entry name="Lab-SDI.web.main" />
+          <factory-entry name="Lab-SDI.web.main" value="aa1af5c5-33c0-40e3-a139-ddec96f2b9c6" />
         </datasource-mapping>
         <naming-strategy-map />
       </configuration>
@@ -16,6 +16,7 @@
         <fileset id="fileset" name="Spring Application Context" removed="false">
           <file>file://$MODULE_DIR$/../../../web/src/main/java/ro/sdi/lab/web/config/Config.java</file>
           <file>file://$MODULE_DIR$/../../../web/src/main/java/ro/sdi/lab/web/config/WebConfig.java</file>
+          <file>file://$MODULE_DIR$/../../../web/src/main/java/ro/sdi/lab/web/config/SecurityConfig.java</file>
         </fileset>
       </configuration>
     </facet>
